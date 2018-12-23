@@ -272,7 +272,7 @@ Transform:
   m_GameObject: {fileID: 930331708}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.3752, y: 1.3752, z: 1.3752}
+  m_LocalScale: {x: 3.201053, y: 3.201053, z: 3.201053}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 3
@@ -290,7 +290,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4313257569117306, guid: 3aec09d93ae1a384d9352d40f1a3db12, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 3.746615e-17
+      value: 3.75
       objectReference: {fileID: 0}
     - target: {fileID: 4313257569117306, guid: 3aec09d93ae1a384d9352d40f1a3db12, type: 2}
       propertyPath: m_LocalPosition.z
@@ -314,6 +314,41 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4313257569117306, guid: 3aec09d93ae1a384d9352d40f1a3db12, type: 2}
       propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 95526174327791996, guid: 3aec09d93ae1a384d9352d40f1a3db12,
+        type: 2}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 176c4860455c9794480aa1e3068dadb4, type: 2}
+    - target: {fileID: 136080814303075880, guid: 3aec09d93ae1a384d9352d40f1a3db12,
+        type: 2}
+      propertyPath: m_Radius
+      value: 0.45650876
+      objectReference: {fileID: 0}
+    - target: {fileID: 136080814303075880, guid: 3aec09d93ae1a384d9352d40f1a3db12,
+        type: 2}
+      propertyPath: m_Height
+      value: 2.0753222
+      objectReference: {fileID: 0}
+    - target: {fileID: 136080814303075880, guid: 3aec09d93ae1a384d9352d40f1a3db12,
+        type: 2}
+      propertyPath: m_Center.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 136080814303075880, guid: 3aec09d93ae1a384d9352d40f1a3db12,
+        type: 2}
+      propertyPath: m_Center.y
+      value: 0.9857073
+      objectReference: {fileID: 0}
+    - target: {fileID: 136080814303075880, guid: 3aec09d93ae1a384d9352d40f1a3db12,
+        type: 2}
+      propertyPath: m_Center.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 95526174327791996, guid: 3aec09d93ae1a384d9352d40f1a3db12,
+        type: 2}
+      propertyPath: m_ApplyRootMotion
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
