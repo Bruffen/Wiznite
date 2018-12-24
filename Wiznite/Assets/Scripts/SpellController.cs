@@ -5,7 +5,7 @@ using UnityEngine;
 public class SpellController : MonoBehaviour {
 
 	public Vector3 Velocity;
-	private float speed = 40f;
+	public float speed;
 
 	// Use this for initialization
 	void Start () {
@@ -25,7 +25,7 @@ public class SpellController : MonoBehaviour {
 			other.transform.GetComponent<PlayerHealth>().TakeDamage(25f);
 			Rigidbody rb = other.GetComponent<Rigidbody>();
 
-			rb.AddForce(transform.forward * 60f);
+			rb.AddForce(transform.forward * 600f);
 			Debug.Log(rb.transform);
 		}
 	}

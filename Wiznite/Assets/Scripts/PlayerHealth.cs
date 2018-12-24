@@ -9,6 +9,8 @@ public class PlayerHealth : MonoBehaviour {
 	private float maxHealth;
 	public Image HealthBar;
 	private Quaternion canvasRotation;
+	private Animator animator;
+
 	// Use this for initialization
 	void Start () {
 		maxHealth = Health;
@@ -21,7 +23,6 @@ public class PlayerHealth : MonoBehaviour {
 		if (Input.GetKeyDown(KeyCode.F))
 			TakeDamage(25);
 		transform.Find("Canvas").rotation = canvasRotation;
-		Debug.Log(maxHealth);
 	}
 
 	public void TakeDamage(float damage)
@@ -31,7 +32,8 @@ public class PlayerHealth : MonoBehaviour {
 
 		if (Health <= 0)
 		{
-			Destroy(this.gameObject);
+			animator.SetTrigger("Die");
+			//transform.GetComponent<CapsuleCollider>().enabled = false;
 		}
 	}
 }
