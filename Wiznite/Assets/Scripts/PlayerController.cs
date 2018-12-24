@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour {
 	private Camera mainCamera;
 	private Animator animator;
 
-	public ParticleSystem attack;
+	public GameObject attack;
 	// Use this for initialization
 	void Start () {
 
@@ -37,39 +37,50 @@ public class PlayerController : MonoBehaviour {
 			transform.LookAt(new Vector3(pointToLook.x, transform.position.y, pointToLook.z));
 		}
 		//animations
-		if (h != 0 && v != 0)
+		if (h != 0 || v != 0)
 		{
 			animator.SetBool("Idle", false);
+			Debug.Log("Idle FALSE");
 			if (h > 0 && v == 0)
 			{
+				Debug.Log("Right");
 				animator.SetBool("Right", true);
 				animator.SetBool("Left", false);
 			}
 			else if((h < 0 && v == 0))
 			{
+				Debug.Log("Left");
 				animator.SetBool("Right", false);
 				animator.SetBool("Left", true);
 			}
 			else if ((v > 0 && h == 0))
 			{
+				Debug.Log("Forward");
 				animator.SetBool("Forward", true);
 				animator.SetBool("Back", false);
 			}
 			else if ((v < 0 && h == 0))
 			{
+				Debug.Log("Back");
 				animator.SetBool("Forward", false);
 				animator.SetBool("Back", true);
 			}
 		}
-		else
+		else if(h == 0 && v == 0)
+		{
+			Debug.Log("Idle");
 			animator.SetBool("Idle", true);
+		}
 
 
 
 		if(Input.GetKeyDown(KeyCode.Mouse0))
 		{
-			animator.SetTrigger("Attacking");
-			attack.Emit(1);
+			animator.SetBool("Attacking",true);
+			GameObject attack1 = Instantiate(attack, this.transform.position, Quaternion.identity);
+			attack1.GetComponent<SpellController>().Velocity = this.transform.forward;
 		}
+		else
+			animator.SetBool("Attacking", false);
 	}
 }
