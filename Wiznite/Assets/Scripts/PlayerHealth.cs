@@ -15,13 +15,12 @@ public class PlayerHealth : MonoBehaviour {
 	void Start () {
 		maxHealth = Health;
 		canvasRotation = transform.Find("Canvas").rotation;
+		animator = GetComponent<Animator>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
 
-		if (Input.GetKeyDown(KeyCode.F))
-			TakeDamage(25);
 		transform.Find("Canvas").rotation = canvasRotation;
 	}
 
@@ -29,11 +28,12 @@ public class PlayerHealth : MonoBehaviour {
 	{
 		Health -= damage;
 		HealthBar.fillAmount = Health / 100f;
+		//GetComponent<PlayerController>().KnockBack(direction);
 
 		if (Health <= 0)
 		{
 			animator.SetTrigger("Die");
-			//transform.GetComponent<CapsuleCollider>().enabled = false;
+			Destroy(this.gameObject);
 		}
 	}
 }

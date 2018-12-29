@@ -4,13 +4,24 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
-	public float speed = 7f, rotSpeed = 7f; 
+	public float speed = 7f, rotSpeed = 7f, hitdistance = 1f;
 	private Vector3 moveInput;
 	private Camera mainCamera;
 	private Animator animator;
-
+	public LayerMask layer;
 	public GameObject attack;
 	private Vector3 oldPosition;
+
+	private bool isknockback = false;
+	private float knockBackForce= 1000;
+	private float knockBackTime = 1;
+	private float knockBackCounter = 0;
+	private Rigidbody impactTarget;
+	private Vector3 impact;
+
+	float timeToWait=0.0f;
+	public float timeToFire;
+
 	// Use this for initialization
 	void Start () {
 
@@ -22,36 +33,89 @@ public class PlayerController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
+
+		if (!animator.GetBool("Attacking") && !isknockback)
+		{
+			Movement();
+			movementAnimation();
+		}
+
+		//Check if is grounded or not
+		if (isGrounded())
+			GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezeRotation;
+		else
+		{
+			GetComponent<Rigidbody>().constraints &= ~RigidbodyConstraints.FreezePositionY;
+			FallForce();
+		}
+
+		//Fire
+		if (Input.GetKeyDown(KeyCode.Mouse0))
+		{
+			animator.SetBool("Attacking", true);
+		}
+
+		//Knockback
+		if (Time.time < knockBackCounter)
+		{
+			isknockback = true;
+			impactTarget.AddForce(impact, ForceMode.VelocityChange);
+		}
+		else
+			isknockback = false;
+	}
+
+	private void Fire()
+	{
+		GameObject attack1 = Instantiate(attack, this.transform.position, Quaternion.identity);
+		attack1.GetComponent<SpellController>().Velocity = this.transform.forward;
+	}
+
+	private void DeactivateAttack()
+	{
+		animator.SetBool("Attacking", false);
+	}
+
+	public void KnockBack(Vector3 direction)
+	{
+		impact = new Vector3(direction.x, 0.0f, direction.z) * knockBackForce * Time.deltaTime;
+		knockBackCounter = Time.time + 0.25f;
+	}
+
+	private void Movement()
+	{
 		oldPosition = transform.position;
 		//movement
 		float h = Input.GetAxis("Horizontal");
 		float v = Input.GetAxis("Vertical");
 		moveInput = new Vector3(h, 0.0f, v) * speed;
 		transform.position += moveInput * Time.deltaTime;
-		
+
 		//rotation
 		Ray cameraRay = mainCamera.ScreenPointToRay(Input.mousePosition);
 		Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
 		float rayLength;
 
-		if(groundPlane.Raycast(cameraRay, out rayLength))
+		if (groundPlane.Raycast(cameraRay, out rayLength))
 		{
 			Vector3 pointToLook = cameraRay.GetPoint(rayLength);
 			transform.LookAt(new Vector3(pointToLook.x, transform.position.y, pointToLook.z));
 		}
+	}
 
+	private void movementAnimation()
+	{
 		Vector3 direction = transform.position - oldPosition;
-		float fowardTest = Vector3.Dot(direction.normalized, transform.forward.normalized);
+		float forwardTest = Vector3.Dot(direction.normalized, transform.forward.normalized);
 		float sideTest = Vector3.Dot(direction.normalized, Vector3.Cross(transform.forward, transform.up).normalized);
 
 		//animations
-		if (fowardTest != 0 || sideTest != 0)
+		if (forwardTest != 0 || sideTest != 0)
 		{
-			if (fowardTest != 0)
+			if (forwardTest != 0)
 			{
 				animator.SetBool("Idle", false);
-				if (fowardTest > 0)
+				if (forwardTest > 0)
 				{
 					animator.SetBool("Forward", true);
 					animator.SetBool("Back", false);
@@ -77,58 +141,25 @@ public class PlayerController : MonoBehaviour {
 				}
 			}
 		}
-		else if(h == 0 && sideTest == 0)
+		else if (forwardTest == 0 && sideTest == 0)
 			animator.SetBool("Idle", true);
-
-		if (Input.GetKeyDown(KeyCode.Mouse0))
-		{
-			animator.SetBool("Attacking",true);
-			if (animator.GetCurrentAnimatorStateInfo(0).IsName("Attacking")){
-				WaitForAnimation();
-			}
-			GameObject attack1 = Instantiate(attack, this.transform.position, Quaternion.identity);
-			attack1.GetComponent<SpellController>().Velocity = this.transform.forward;
-		}
-		else
-			animator.SetBool("Attacking", false);
 	}
 
-	private IEnumerator WaitForAnimation()
+	void FallForce()
 	{
-		yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length + animator.GetCurrentAnimatorStateInfo(0).normalizedTime);
+		float fallY;
+		float airVelocity = -9.8f;
+		Vector3 gravity = Physics.gravity * Time.deltaTime;
+		airVelocity += gravity.y;
+		fallY = airVelocity * Time.deltaTime;
+
+		transform.position = Vector3.MoveTowards(transform.position, transform.position - new Vector3(0f, fallY, 0f), Time.deltaTime * airVelocity); 
 	}
 
-
-	/*private void Animations(Vector3 movV, Vector3 movH)
+	private bool isGrounded()
 	{
-		//animations
-		if (h != 0 || v != 0)
-		{
-			animator.SetBool("Idle", false);
-			//Debug.Log("Idle FALSE");
-			if (h > 0 && v == 0)
-			{
-				//Debug.Log("Right");
-				animator.SetBool("Right", true);
-				animator.SetBool("Left", false);
-			}
-			else if ((h < 0 && v == 0))
-			{
-				//Debug.Log("Left");
-				animator.SetBool("Right", false);
-				animator.SetBool("Left", true);
-			}
-			else if ((v > 0 && h == 0))
-			{
-				//Debug.Log("Forward");
-				animator.SetBool("Forward", true);
-				animator.SetBool("Back", false);
-			}
-			else if ((v < 0 && h == 0))
-			{
-				//Debug.Log("Back");
-				animator.SetBool("Forward", false);
-				animator.SetBool("Back", true);
-			}
-		}*/
+		//Debug.DrawLine(transform.position, transform.position + Vector3.down, Color.cyan);
+		//return Physics.Raycast(transform.position + Vector3.down, -transform.forward, hitdistance, layer);
+		return Physics.Linecast(transform.position, transform.position + Vector3.down, layer);
+	}
 }

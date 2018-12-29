@@ -10,6 +10,7 @@ public class SpellController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		Velocity *= speed;
+		transform.forward = Velocity;
 	}
 	
 	// Update is called once per frame
@@ -22,11 +23,12 @@ public class SpellController : MonoBehaviour {
 	{
 		if(other.tag == "Player")
 		{
-			other.transform.GetComponent<PlayerHealth>().TakeDamage(25f);
-			Rigidbody rb = other.GetComponent<Rigidbody>();
+			Vector3 direction = other.transform.position - this.transform.position;
+			direction = direction.normalized;
 
-			rb.AddForce(transform.forward * 600f);
-			Debug.Log(rb.transform);
+			//other.transform.GetComponent<PlayerController>().KnockBack(direction);
+			other.transform.GetComponent<Dummie>().KnockBack(direction);
+			Destroy(this.gameObject);
 		}
 	}
 }
