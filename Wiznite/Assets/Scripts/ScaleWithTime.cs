@@ -11,7 +11,7 @@ public class ScaleWithTime : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        size = new Vector3(max, 1, max);
+        size = new Vector3(max, this.transform.localScale.y, max);
 
         this.transform.localScale = size;
     }
