@@ -8,6 +8,7 @@
         LobbyUnready,
         LobbySync,
         LobbyReady,
+        LobbiesRequest,
         GameStarted,
         GameDisconnected,
         GameConnecting,

@@ -5,6 +5,7 @@
         PlayerName,
         NewPlayer,
         NewLobby,
+        ListLobbies,
         LobbyStatus,
         PlayerMovement,
         FinishedSync,

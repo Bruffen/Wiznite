@@ -12,31 +12,37 @@ namespace Menu
         private UdpClientController udp;
 
         //Player
-        private string playerName;
         public Text PlayerTab;
 
         //Find Lobby
+        public DynamicLobbyList dynamicLobbyList;
 
         //Create Lobby
         public Text LobbyName;
 
         void Start()
         {
-            ClientInformation.UdpClientController = new UdpClientController();
             udp = ClientInformation.UdpClientController;
-            playerName = PlayerTab.text;
+            PlayerTab.text = udp.Player.Name;
+            //playerName = PlayerTab.text;
         }
 
         public void UpdateName(string input)
         {
-            playerName = input;
-            PlayerTab.text = playerName;
+            udp.Player.Name = input;
+            PlayerTab.text = input;
+            //TODO Send server new name maybe???
         }
 
         public void CreateLobby()
         {
-            string lobbyName = LobbyName.text == "" ? (playerName + "'s Game") : LobbyName.text;
-            ClientInformation.UdpClientController.NewLobby(lobbyName, playerName);
+            string lobbyName = LobbyName.text == "" ? (udp.Player.Name + "'s Game") : LobbyName.text;
+            ClientInformation.UdpClientController.NewLobby(lobbyName);
+        }
+
+        public void CreateLobbyList()
+        {
+            dynamicLobbyList.CreateLobbyList(udp.LobbyList());
         }
     }
 }

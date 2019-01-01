@@ -12,10 +12,13 @@ namespace Server
     public class ServerController
     {
         private Dictionary<Guid, LobbyServerSide> lobbies;
+        private Dictionary<Guid, Player> players;
+        private UdpClient client;
 
         public ServerController()
         {
             lobbies = new Dictionary<Guid, LobbyServerSide>();
+            players = new Dictionary<Guid, Player>();
         }
 
         public void Start()
@@ -23,7 +26,7 @@ namespace Server
             int port = 7777;
             Console.WriteLine("Server started listening in port " + port);
 
-            using (UdpClient client = new UdpClient(port))
+            using (client = new UdpClient(port))
             {
                 IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, port);
                 while (true)
@@ -34,11 +37,17 @@ namespace Server
 
                     switch (playerMsg.GameState)
                     {
+                        case GameState.LobbyDisconnected:
+                            NewPlayer(playerMsg, endPoint);
+                            break;
                         case GameState.LobbyCreation:
-                            NewLobby(playerMsg, client, endPoint);
+                            NewLobby(playerMsg, endPoint);
+                            break;
+                        case GameState.LobbiesRequest:
+                            SendExistingLobbies(endPoint);
                             break;
                         case GameState.LobbyConnecting:
-                            NewPlayer(playerMsg, client, endPoint);
+
                             break;
                     }
                 }
@@ -46,35 +55,86 @@ namespace Server
         }
 
         /*
+         * Creation of player 
+         * Information suchs as IDs are sent back to the player
+         */
+        private void NewPlayer(Player p, IPEndPoint endPoint)
+        {
+            p.Id = Guid.NewGuid();
+            p.GameState = GameState.LobbyDisconnected;
+            p.IP = endPoint;
+            players.Add(p.Id, p);
+            Console.WriteLine("New player: " + p.Name);
+
+            //Send player back with generated ID
+            string playerJson = JsonConvert.SerializeObject(p);
+            byte[] msg = Encoding.ASCII.GetBytes(playerJson);
+            client.Send(msg, msg.Length, endPoint);
+        }
+
+        /*
          * Lobby creation from owner player
          * Owner player sends lobby's name
          */
-        private void NewLobby(Player p, UdpClient client, IPEndPoint endPoint)
+        private void NewLobby(Player p, IPEndPoint endPoint)
         {
             LobbyServerSide newLobby = new LobbyServerSide(p.Lobby.Name);
             p.Lobby.Id = Guid.NewGuid();
             lobbies.Add(p.Lobby.Id, newLobby);
-            Console.WriteLine("New lobby created: " + p.Lobby.Id + ", " + newLobby.Name);
+            Console.WriteLine("New lobby created: " + newLobby.Name + ", " + p.Lobby.Id);
             p.GameState = GameState.LobbyConnecting;
 
-            NewPlayer(p, client, endPoint);
+            JoinCreatedLobby(p, endPoint);
         }
 
         /*
-         * Creation of player 
-         * Both when he creates a new lobby or joins an already existing one
-         * Information suchs as IDs are sent back to the player
+         * Joining owner to newly created lobby
+         * Send player with lobby ID back
          */
-        private void NewPlayer(Player p, UdpClient client, IPEndPoint endPoint)
+        private void JoinCreatedLobby(Player p, IPEndPoint endPoint)
         {
-            Console.WriteLine("New player " + p.Name + " in " + p.Lobby.Name);
-            p.Id = Guid.NewGuid();
             lobbies[p.Lobby.Id].Players.Add(p);
-            p.GameState = GameState.LobbySync;
-            p.UdpClient = new UdpClient(endPoint);
+            p.GameState = GameState.LobbyUnready;
+            Console.WriteLine(p.Name + " has joined " + lobbies[p.Lobby.Id].Name);
 
             string playerJson = JsonConvert.SerializeObject(p);
             byte[] msg = Encoding.ASCII.GetBytes(playerJson);
+            client.Send(msg, msg.Length, endPoint);
+        }
+
+        /*
+         * Prepare client side lobbies to send list to players
+         * This is so player can see all existing lobbies and choose to join one
+         */
+        private List<Lobby> ListLobbies()
+        {
+            List<Lobby> lobbyList = new List<Lobby>();
+            foreach (KeyValuePair<Guid, LobbyServerSide> lobby in lobbies)
+            {
+                Lobby l = new Lobby
+                {
+                    Id = lobby.Key,
+                    Name = lobby.Value.Name,
+                    PlayerCount = lobby.Value.Players.Count
+                };
+
+                lobbyList.Add(l);
+            }
+
+            return lobbyList;
+        }
+
+        /*
+         * Send message listing all existing lobbies
+         */ 
+        private void SendExistingLobbies(IPEndPoint endPoint)
+        {
+            Message message = new Message();
+            message.MessageType = MessageType.ListLobbies;
+            message.Description = JsonConvert.SerializeObject(ListLobbies());
+            string msgJson = JsonConvert.SerializeObject(message);
+            byte[] msg = Encoding.ASCII.GetBytes(msgJson);
+
             client.Send(msg, msg.Length, endPoint);
         }
     }
