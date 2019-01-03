@@ -44,5 +44,17 @@ namespace Menu
         {
             dynamicLobbyList.CreateLobbyList(udp.LobbyList());
         }
+
+        public void JoinSelectedLobby()
+        {
+            if (dynamicLobbyList.LobbySelected != null)
+            {
+                if (udp.JoinExistingLobby(dynamicLobbyList.LobbySelected.ID))
+                {
+                    Debug.Log("Joining " + udp.Player.Lobby.Name);
+                    GetComponent<SceneController>().LoadLobby();
+                }
+            }
+        }
     }
 }

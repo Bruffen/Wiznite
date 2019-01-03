@@ -1,5 +1,6 @@
 ﻿using Common;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
@@ -32,21 +33,22 @@ namespace UdpNetwork
             Player.UdpClient = udpClient;
             Player.Name = name;
             Player.GameState = GameState.LobbyDisconnected;
-
-            byte[] msg = CreatePlayerMessage();
-            udpClient.Send(msg, msg.Length);
+            SendPlayerMessage();
 
             byte[] answer = udpClient.Receive(ref endPoint);
             string answerJson = Encoding.ASCII.GetString(answer);
             Player answerPlayer = JsonConvert.DeserializeObject<Player>(answerJson);
         }
 
-        private byte[] CreatePlayerMessage()
+        /*
+         * Creates Player Json message and sends it to server
+         * It's done a lot so this method is to make things easier and cleaner
+         */
+        private void SendPlayerMessage()
         {
             string playerJson = JsonConvert.SerializeObject(Player);
             byte[] msg = Encoding.ASCII.GetBytes(playerJson);
-
-            return msg;
+            udpClient.Send(msg, msg.Length);
         }
 
         private void Listen()
@@ -56,13 +58,25 @@ namespace UdpNetwork
                 Debug.Log("Thread Started");
                 byte[] answer = udpClient.Receive(ref endPoint);
                 string answerJson = Encoding.ASCII.GetString(answer);
-                Message message = JsonConvert.DeserializeObject<Message>(answerJson);
+                try
+                {
+                    Message message = JsonConvert.DeserializeObject<Message>(answerJson);
 
-                Player.Messages.Add(message);
-                Debug.Log(message.ToString());
+                    Player.Messages.Add(message);
+                    Debug.Log(message.ToString());
+                }
+                catch (System.Exception e)
+                {
+                    Debug.Log(e);
+                    throw;
+                }
             }
         }
 
+        /*
+         * Create new lobby with name and send it the server
+         * Receive server's answer with lobby's generated Id
+         */
         public void NewLobby(string lobbyName)
         {
             Player.GameState = GameState.LobbyCreation;
@@ -70,9 +84,8 @@ namespace UdpNetwork
             Lobby lobby = new Lobby();
             lobby.Name = lobbyName;
             Player.Lobby = lobby;
+            SendPlayerMessage();
 
-            byte[] msg = CreatePlayerMessage();
-            udpClient.Send(msg, msg.Length);
 
             byte[] answer = udpClient.Receive(ref endPoint);
             string answerJson = Encoding.ASCII.GetString(answer);
@@ -84,12 +97,13 @@ namespace UdpNetwork
             thread.Start();
         }
 
+        /*
+         * Asks server for a Message with all lobbies listed
+         */
         public List<Lobby> LobbyList()
         {
             Player.GameState = GameState.LobbiesRequest;
-
-            byte[] msg = CreatePlayerMessage();
-            udpClient.Send(msg, msg.Length);
+            SendPlayerMessage();
 
             Player.GameState = GameState.LobbyDisconnected;
 
@@ -101,6 +115,29 @@ namespace UdpNetwork
                 return JsonConvert.DeserializeObject<List<Lobby>>(message.Description);
             }
             return null;
+        }
+
+        /*
+         * Asks server permission to join asked lobby
+         * Answer will be null if lobby is already full and therefore return false
+         */
+        public bool JoinExistingLobby(Guid lobbyID)
+        {
+            Player.GameState = GameState.LobbyConnecting;
+            Player.Lobby = new Lobby { Id = lobbyID };
+            SendPlayerMessage();
+
+            byte[] answer = udpClient.Receive(ref endPoint);
+            string answerJson = Encoding.ASCII.GetString(answer);
+            Player answerPlayer = JsonConvert.DeserializeObject<Player>(answerJson);
+
+            if (answerPlayer != null)
+            {
+                Player.GameState = answerPlayer.GameState;
+                Player.Lobby = answerPlayer.Lobby;
+                return true;
+            }
+            return false;
         }
     }
 

@@ -11,9 +11,10 @@ namespace Server
 {
     public class ServerController
     {
+        private const int MaxPlayersPerLobby = 4;
         private Dictionary<Guid, LobbyServerSide> lobbies;
         private Dictionary<Guid, Player> players;
-        private UdpClient client;
+        private UdpClient server;
 
         public ServerController()
         {
@@ -26,12 +27,12 @@ namespace Server
             int port = 7777;
             Console.WriteLine("Server started listening in port " + port);
 
-            using (client = new UdpClient(port))
+            using (server = new UdpClient(port))
             {
                 IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, port);
                 while (true)
                 {
-                    byte[] msg = client.Receive(ref endPoint);
+                    byte[] msg = server.Receive(ref endPoint);
                     string jsonMsg = Encoding.ASCII.GetString(msg);
                     Player playerMsg = JsonConvert.DeserializeObject<Player>(jsonMsg);
 
@@ -47,7 +48,7 @@ namespace Server
                             SendExistingLobbies(endPoint);
                             break;
                         case GameState.LobbyConnecting:
-
+                            JoinExistingLobby(playerMsg, endPoint);
                             break;
                     }
                 }
@@ -69,7 +70,8 @@ namespace Server
             //Send player back with generated ID
             string playerJson = JsonConvert.SerializeObject(p);
             byte[] msg = Encoding.ASCII.GetBytes(playerJson);
-            client.Send(msg, msg.Length, endPoint);
+
+            server.Send(msg, msg.Length, endPoint);
         }
 
         /*
@@ -99,7 +101,7 @@ namespace Server
 
             string playerJson = JsonConvert.SerializeObject(p);
             byte[] msg = Encoding.ASCII.GetBytes(playerJson);
-            client.Send(msg, msg.Length, endPoint);
+            server.Send(msg, msg.Length, endPoint);
         }
 
         /*
@@ -135,7 +137,30 @@ namespace Server
             string msgJson = JsonConvert.SerializeObject(message);
             byte[] msg = Encoding.ASCII.GetBytes(msgJson);
 
-            client.Send(msg, msg.Length, endPoint);
+            server.Send(msg, msg.Length, endPoint);
+        }
+
+        /*
+         * Player chooses an existing lobby to join and sends its ID here
+         * Everything from the lobby is then sent back
+         */
+        private void JoinExistingLobby(Player p, IPEndPoint endPoint)
+        {
+            string playerJson = "null";
+            if (lobbies[p.Lobby.Id].Players.Count < MaxPlayersPerLobby)
+            {
+                lobbies[p.Lobby.Id].Players.Add(p);
+                Console.WriteLine(p.Name + " has joined " + lobbies[p.Lobby.Id].Name);
+
+                p.Lobby.Name = lobbies[p.Lobby.Id].Name;
+                p.Lobby.PlayerCount = lobbies[p.Lobby.Id].Players.Count;
+                p.GameState = GameState.LobbyUnready;
+
+                playerJson = JsonConvert.SerializeObject(p);
+            }
+            byte[] msg = Encoding.ASCII.GetBytes(playerJson);
+
+            server.Send(msg, msg.Length, endPoint);
         }
     }
 }

@@ -11,10 +11,19 @@ namespace Menu
     public class DynamicLobbyList : MonoBehaviour
     {
         public GameObject LobbyInfoPrefab;
+        public GuidButtonPair LobbySelected;
         private List<GuidButtonPair> lobbyList;
 
         public void CreateLobbyList(List<Lobby> lobbies)
         {
+            //Clear old prefabs of lobby buttons
+            RectTransform[] buttons = GetComponentsInChildren<RectTransform>();
+            if (buttons.Length != 0)
+                foreach (RectTransform b in buttons)
+                    if (b != this.transform)
+                        Destroy(b.gameObject);
+
+            //Create new lobby list to clear old lobbies
             lobbyList = new List<GuidButtonPair>();
 
             foreach (Lobby lobby in lobbies)
@@ -33,7 +42,8 @@ namespace Menu
 
         private void SelectLobby(GuidButtonPair guidButton)
         {
-            Debug.Log("I was clicked: " + guidButton.ID + ", " + guidButton.Button.GetComponentsInChildren<Text>()[0].text);
+            Debug.Log("I was clicked: " + guidButton.Button.GetComponentsInChildren<Text>()[0].text + ", " + guidButton.ID);
+            LobbySelected = guidButton;
         }
     }
 
