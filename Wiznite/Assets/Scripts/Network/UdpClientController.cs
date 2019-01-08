@@ -13,10 +13,10 @@ namespace UdpNetwork
     public class UdpClientController
     {
         public Player Player;
+        public ThreadManager ThreadManager;
         private UdpClient udpClient;
-        private IPEndPoint endPoint;
+        private IPEndPoint endPoint, multicastEndPoint;
         private Thread thread;
-        private ThreadManager threadManager;
 
         public UdpClientController()
         {
@@ -24,7 +24,6 @@ namespace UdpNetwork
             udpClient = new UdpClient();
             endPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), port);
             udpClient.Connect(endPoint);
-            threadManager = ScriptableObject.CreateInstance<ThreadManager>();
         }
 
         public void CreatePlayer(string name)
@@ -33,11 +32,11 @@ namespace UdpNetwork
             Player.UdpClient = udpClient;
             Player.Name = name;
             Player.GameState = GameState.LobbyDisconnected;
+            Player.Messages = new List<Message>();
             SendPlayerMessage();
 
-            byte[] answer = udpClient.Receive(ref endPoint);
-            string answerJson = Encoding.ASCII.GetString(answer);
-            Player answerPlayer = JsonConvert.DeserializeObject<Player>(answerJson);
+            Player answerPlayer = ReceivePlayerMessage();
+            Player.Id = answerPlayer.Id;
         }
 
         /*
@@ -51,26 +50,53 @@ namespace UdpNetwork
             udpClient.Send(msg, msg.Length);
         }
 
+        private Player ReceivePlayerMessage()
+        {
+            byte[] answer = udpClient.Receive(ref endPoint);
+            string answerJson = Encoding.ASCII.GetString(answer);
+            return JsonConvert.DeserializeObject<Player>(answerJson);
+        }
+
         private void Listen()
         {
-            while (threadManager.Running)
+            //Join multicast for lobby communication
+            Debug.Log("Thread started");
+            udpClient.Close();
+            udpClient = new UdpClient();
+            multicastEndPoint = new IPEndPoint(IPAddress.Any, Player.Lobby.MulticastPort);
+            udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            udpClient.Client.Bind(multicastEndPoint);
+            udpClient.JoinMulticastGroup(IPAddress.Parse(Player.Lobby.MulticastIP));
+
+            while (ThreadManager.Running)
             {
-                Debug.Log("Thread Started");
-                byte[] answer = udpClient.Receive(ref endPoint);
+                byte[] answer = udpClient.Receive(ref multicastEndPoint);
                 string answerJson = Encoding.ASCII.GetString(answer);
                 try
                 {
                     Message message = JsonConvert.DeserializeObject<Message>(answerJson);
-
-                    Player.Messages.Add(message);
-                    Debug.Log(message.ToString());
+                    if (message == null)
+                    {
+                        Debug.Log("Null message");
+                    }
+                    else
+                    {
+                        Player.Messages.Add(message);
+                        Debug.Log("Message received: " + message.Description);
+                    }
                 }
                 catch (System.Exception e)
                 {
-                    Debug.Log(e);
+                    Debug.Log(e.StackTrace);
                     throw;
                 }
             }
+
+            Debug.Log("Thread Killed");
+            //Change back to unicast for menu communication
+            udpClient.Close();
+            udpClient = new UdpClient();
+            udpClient.Connect(endPoint);
         }
 
         /*
@@ -86,15 +112,9 @@ namespace UdpNetwork
             Player.Lobby = lobby;
             SendPlayerMessage();
 
-
-            byte[] answer = udpClient.Receive(ref endPoint);
-            string answerJson = Encoding.ASCII.GetString(answer);
-            Player answerPlayer = JsonConvert.DeserializeObject<Player>(answerJson);
-
-            Player.Lobby.Id = answerPlayer.Lobby.Id;
-
-            thread = new Thread(new ThreadStart(Listen));
-            thread.Start();
+            Player answerPlayer = ReceivePlayerMessage();
+            Player.Lobby = answerPlayer.Lobby;
+            StartThread();
         }
 
         /*
@@ -127,17 +147,25 @@ namespace UdpNetwork
             Player.Lobby = new Lobby { Id = lobbyID };
             SendPlayerMessage();
 
-            byte[] answer = udpClient.Receive(ref endPoint);
-            string answerJson = Encoding.ASCII.GetString(answer);
-            Player answerPlayer = JsonConvert.DeserializeObject<Player>(answerJson);
+            Player answerPlayer = ReceivePlayerMessage();
 
             if (answerPlayer != null)
             {
                 Player.GameState = answerPlayer.GameState;
                 Player.Lobby = answerPlayer.Lobby;
+                StartThread();
                 return true;
             }
             return false;
+        }
+
+        private void StartThread()
+        {
+            if (ThreadManager != null)
+                ScriptableObject.Destroy(ThreadManager);
+            ThreadManager = ScriptableObject.CreateInstance<ThreadManager>();
+            thread = new Thread(new ThreadStart(Listen));
+            thread.Start();
         }
     }
 
@@ -145,11 +173,12 @@ namespace UdpNetwork
     {
         public bool Running;
 
-        void Start()
+        void OnEnable()
         {
             Running = true;
         }
 
+        //When game is stopped, kill thread so the game doesn't freeze when it's restarted
         void OnDestroy()
         {
             Running = false;

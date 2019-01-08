@@ -9,7 +9,7 @@ namespace Menu
 {
     public class MainMenu : MonoBehaviour
     {
-        private UdpClientController udp;
+        private UdpClientController client;
 
         //Player
         public Text PlayerTab;
@@ -22,36 +22,36 @@ namespace Menu
 
         void Start()
         {
-            udp = ClientInformation.UdpClientController;
-            PlayerTab.text = udp.Player.Name;
+            client = ClientInformation.UdpClientController;
+            PlayerTab.text = client.Player.Name;
             //playerName = PlayerTab.text;
         }
 
         public void UpdateName(string input)
         {
-            udp.Player.Name = input;
+            client.Player.Name = input;
             PlayerTab.text = input;
             //TODO Send server new name maybe???
         }
 
         public void CreateLobby()
         {
-            string lobbyName = LobbyName.text == "" ? (udp.Player.Name + "'s Game") : LobbyName.text;
+            string lobbyName = LobbyName.text == "" ? (client.Player.Name + "'s Game") : LobbyName.text;
             ClientInformation.UdpClientController.NewLobby(lobbyName);
         }
 
         public void CreateLobbyList()
         {
-            dynamicLobbyList.CreateLobbyList(udp.LobbyList());
+            dynamicLobbyList.CreateLobbyList(client.LobbyList());
         }
 
         public void JoinSelectedLobby()
         {
             if (dynamicLobbyList.LobbySelected != null)
             {
-                if (udp.JoinExistingLobby(dynamicLobbyList.LobbySelected.ID))
+                if (client.JoinExistingLobby(dynamicLobbyList.LobbySelected.ID))
                 {
-                    Debug.Log("Joining " + udp.Player.Lobby.Name);
+                    Debug.Log("Joining " + client.Player.Lobby.Name);
                     GetComponent<SceneController>().LoadLobby();
                 }
             }

@@ -1,13 +1,15 @@
 ﻿using Common;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Net;
+using System.Net.Sockets;
 
 namespace Server
 {
     public class LobbyServerSide
     {
+        public UdpClient UdpLobby { get; set; }
+        public string MulticastIP { get; set; }
+        public int MulticastPort { get; set; }
         public string Name { get; set; }
         public List<Player> Players { get; set; }
 
