@@ -13,7 +13,6 @@ namespace UdpNetwork
     public class UdpClientController
     {
         public Player Player;
-        public ThreadManager ThreadManager;
         private UdpClient udpClient;
         private IPEndPoint endPoint, multicastEndPoint;
         private Thread thread;
@@ -68,35 +67,31 @@ namespace UdpNetwork
             udpClient.Client.Bind(multicastEndPoint);
             udpClient.JoinMulticastGroup(IPAddress.Parse(Player.Lobby.MulticastIP));
 
-            while (ThreadManager.Running)
+            while (true)
             {
-                byte[] answer = udpClient.Receive(ref multicastEndPoint);
-                string answerJson = Encoding.ASCII.GetString(answer);
-                try
+                udpClient.BeginReceive(new AsyncCallback(ReceiveCallback), udpClient);
+            }
+        }
+
+        private void ReceiveCallback(IAsyncResult ar)
+        {
+            UdpClient u = (UdpClient)ar;
+            byte[] msg = u.EndReceive(ar, ref multicastEndPoint);
+
+            string msgJson = Encoding.ASCII.GetString(msg);
+            try
+            {
+                Message message = JsonConvert.DeserializeObject<Message>(msgJson);
+                if (message != null)
                 {
-                    Message message = JsonConvert.DeserializeObject<Message>(answerJson);
-                    if (message == null)
-                    {
-                        Debug.Log("Null message");
-                    }
-                    else
-                    {
-                        Player.Messages.Add(message);
-                        Debug.Log("Message received: " + message.Description);
-                    }
-                }
-                catch (System.Exception e)
-                {
-                    Debug.Log(e.StackTrace);
-                    throw;
+                    Player.Messages.Add(message);
+                    Debug.Log("Message received: " + message.Description);
                 }
             }
-
-            Debug.Log("Thread Killed");
-            //Change back to unicast for menu communication
-            udpClient.Close();
-            udpClient = new UdpClient();
-            udpClient.Connect(endPoint);
+            catch (System.Exception e)
+            {
+                Debug.Log(e.StackTrace);
+            }
         }
 
         /*
@@ -161,27 +156,23 @@ namespace UdpNetwork
 
         private void StartThread()
         {
-            if (ThreadManager != null)
-                ScriptableObject.Destroy(ThreadManager);
-            ThreadManager = ScriptableObject.CreateInstance<ThreadManager>();
             thread = new Thread(new ThreadStart(Listen));
             thread.Start();
         }
-    }
 
-    public class ThreadManager : ScriptableObject
-    {
-        public bool Running;
-
-        void OnEnable()
+        /*
+         * Kills listenning thread
+         * Redoes unicast udp connection
+         */
+        public void CloseThread()
         {
-            Running = true;
-        }
+            udpClient.Close();
+            udpClient = new UdpClient();
+            udpClient.Connect(endPoint);
 
-        //When game is stopped, kill thread so the game doesn't freeze when it's restarted
-        void OnDestroy()
-        {
-            Running = false;
+            thread.Abort();
+            thread.Join(500);
+            thread = null;
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Menu
 
         public void KillLobbyThread()
         {
-            client.ThreadManager.Running = false;
+            client.CloseThread();
         }
     }
 }
