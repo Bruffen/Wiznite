@@ -30,42 +30,32 @@ namespace Menu
                     switch (p.Player.LobbyPos)
                     {
                         case 0:
-                            PlayerCanvas[0].SetActive(true);
-                            PlayerCanvas[0].transform.GetChild(0).GetChild(1).gameObject.GetComponent<Text>().text = p.Player.Name;
-                            if (p.Player.GameState == GameState.LobbyReady)
-                                SetReady(PlayerCanvas[0].transform, true);
-                            else
-                                SetReady(PlayerCanvas[0].transform, false);
+                            UpdateCanvas(PlayerCanvas[0], p.Player);
                             break;
                         case 1:
-                            PlayerCanvas[1].SetActive(true);
-                            PlayerCanvas[1].transform.GetChild(0).GetChild(1).gameObject.GetComponent<Text>().text = p.Player.Name;
-                            if (p.Player.GameState == GameState.LobbyReady)
-                                SetReady(PlayerCanvas[1].transform, true);
-                            else
-                                SetReady(PlayerCanvas[1].transform, false);
+                            UpdateCanvas(PlayerCanvas[1], p.Player);
                             break;
                         case 2:
-                            PlayerCanvas[2].SetActive(true);
-                            PlayerCanvas[2].transform.GetChild(0).GetChild(1).gameObject.GetComponent<Text>().text = p.Player.Name;
-                            if (p.Player.GameState == GameState.LobbyReady)
-                                SetReady(PlayerCanvas[2].transform, true);
-                            else
-                                SetReady(PlayerCanvas[2].transform, false);
+                            UpdateCanvas(PlayerCanvas[2], p.Player);
                             break;
                         case 3:
-                            PlayerCanvas[3].SetActive(true);
-                            PlayerCanvas[3].transform.GetChild(0).GetChild(1).gameObject.GetComponent<Text>().text = p.Player.Name;
-                            if (p.Player.GameState == GameState.LobbyReady)
-                                SetReady(PlayerCanvas[3].transform, true);
-                            else
-                                SetReady(PlayerCanvas[3].transform, false);
+                            UpdateCanvas(PlayerCanvas[3], p.Player);
                             break;
                     }
                 }
 
                 client.SyncPlayers = false;
             }
+        }
+
+        private void UpdateCanvas(GameObject canvas, Player p)
+        {
+            canvas.SetActive(true);
+            canvas.transform.GetChild(0).GetChild(1).gameObject.GetComponent<Text>().text = p.Name;
+            if (p.GameState == GameState.LobbyReady || p.GameState == GameState.GameStarted)
+                SetReady(canvas.transform, true);
+            else
+                SetReady(canvas.transform, false);
         }
 
         private void SetReady(Transform t, bool isReady)

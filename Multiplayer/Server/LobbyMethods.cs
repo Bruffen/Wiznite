@@ -158,9 +158,23 @@ namespace Server
 		{
 			LobbyServerSide l = lobbies[p.Lobby.Id];
 			l.Players[p.LobbyPos].GameState = p.GameState;
-
-            SendPlayersInLobby(l, p);
 			Console.WriteLine("    " + l.Players[p.LobbyPos].Name + " has readied up.");
+
+            int readies = 0;
+            foreach (Player player in l.Players)
+            {
+                if (player.GameState == GameState.LobbyReady)
+                    readies++;
+            }
+            Console.WriteLine(string.Format("{0} out of {1} players are ready in {2}.", readies, MaxPlayersPerLobby, l.Name));
+
+            if (readies == MaxPlayersPerLobby)
+            {
+                foreach (Player player in l.Players)
+                    player.GameState = GameState.GameStarted;
+                Console.WriteLine(l.Name + " is going to start.");
+            }
+            SendPlayersInLobby(l, p);
 		}
 
         /*

@@ -251,8 +251,13 @@ namespace UdpNetwork
             {
                 if (p != null)
                 {
-                    LobbyPlayer lp = new LobbyPlayer(p);
-                    lobbyPlayers.Add(p.Id, lp);
+                    if (p.Id == Player.Id)
+                    {
+                        lobbyPlayers.Add(Player.Id, new LobbyPlayer(Player));
+                        Console.WriteLine(lobbyPlayers[p.Id].Player.GameState);
+                    }
+                    else
+                        lobbyPlayers.Add(p.Id, new LobbyPlayer(p));
                 }
             }
             SyncPlayers = true;
