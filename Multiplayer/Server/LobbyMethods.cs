@@ -52,11 +52,42 @@ namespace Server
             JoinCreatedLobby(p, endPoint);
         }
 
-        /*
+		/*
+		* Player removed from server
+		* ifthere's no one left lobby is deleted else message is sent to the remaining players
+		*/
+		private void RemovePlayer(Player p, IPEndPoint endPoint)
+		{
+			LobbyServerSide l = lobbies[p.Lobby.Id];
+
+			l.Players[p.LobbyPos] = null;
+			Console.WriteLine("Player: " + p.Name + " left");
+
+			if(CountPlayersInLobby(l) > 0)
+			{
+				SendPlayersInLobby(l, p);
+				Console.WriteLine("    " + p.Name + " left the lobby.");
+			}
+			else
+				RemoveLobby(p);
+		}
+
+		/*
+         * Lobby deleted
+         */
+		private void RemoveLobby(Player p)
+		{
+			LobbyServerSide l = lobbies[p.Lobby.Id];
+
+			lobbies.Remove(p.Lobby.Id);
+			Console.WriteLine(string.Format("Lobby deleted: {0}", l.Name));
+		}
+
+		/*
          * Joining owner to newly created lobby
          * Send player with lobby ID back
          */
-        private void JoinCreatedLobby(Player p, IPEndPoint endPoint)
+		private void JoinCreatedLobby(Player p, IPEndPoint endPoint)
         {
             lobbies[p.Lobby.Id].Players[0] = p;
             p.GameState = GameState.LobbyUnready;

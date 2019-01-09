@@ -65,6 +65,9 @@ namespace Server
                         case GameState.LobbyDisconnected:
                             NewPlayer(playerMsg, endPoint);
                             break;
+						case GameState.LobbyDisconnecting:
+							RemovePlayer(playerMsg, endPoint);
+							break;
                         case GameState.LobbyCreation:
                             NewLobby(playerMsg, endPoint);
                             break;
@@ -83,7 +86,7 @@ namespace Server
                         case GameState.LobbyUnready:
                             HandlePlayerReady(playerMsg);
                             break;
-                    }
+					}
                 }
             }
         }

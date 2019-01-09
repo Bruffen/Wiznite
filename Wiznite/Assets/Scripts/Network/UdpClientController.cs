@@ -97,6 +97,12 @@ namespace UdpNetwork
             SendPlayerMessageMulticast();
         }
 
+		public void SendPlayerLeaveMessage()
+		{
+			Player.GameState = GameState.LobbyDisconnecting;
+			SendPlayerMessageMulticast();
+		}
+
         public void SendMessage(Message msg)
         {
             string msgJson = JsonConvert.SerializeObject(msg);

@@ -46,14 +46,14 @@ public class PlayerController : MonoBehaviour
             movementAnimation();
         }
 
-        //Check if is grounded or not
-        if (isGrounded())
-            GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezeRotation;
-        else
-        {
-            GetComponent<Rigidbody>().constraints &= ~RigidbodyConstraints.FreezePositionY;
-            FallForce();
-        }
+		//Check if is grounded or not
+		/*if (isGrounded())
+			GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezeRotation;
+		else
+		{
+			GetComponent<Rigidbody>().constraints &= ~RigidbodyConstraints.FreezePositionY;
+			FallForce();
+		}*/
 
         //Fire
         if (Input.GetKeyDown(KeyCode.Mouse0))

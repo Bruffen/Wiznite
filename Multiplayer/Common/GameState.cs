@@ -3,6 +3,7 @@
     public enum GameState
     {
         LobbyDisconnected,
+		LobbyDisconnecting,
         LobbyCreation,
         LobbyConnecting,
         LobbyUnready,

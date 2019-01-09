@@ -72,11 +72,17 @@ namespace Menu
         private void OnDestroy()
         {
             KillLobbyThread();
+			RemoveClientFromLobby();
         }
 
         public void GetReady()
         {
             client.SendPlayerReadyMessage();
         }
+
+		public void RemoveClientFromLobby()
+		{
+			client.SendPlayerLeaveMessage();
+		}
     }
 }
