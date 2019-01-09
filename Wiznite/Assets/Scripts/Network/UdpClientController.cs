@@ -31,17 +31,13 @@ namespace UdpNetwork
             SyncPlayers = false;
         }
 
-        public void UpdateMessages()
+        private void ProcessMessage(Message msg)
         {
-            if (Player.Messages.Count == 0)
-                return;
-            Debug.Log("Message received");
-            Message message = Player.Messages.Dequeue();
-            switch (message.MessageType)
+            switch (msg.MessageType)
             {
                 case MessageType.LobbyNewPlayer:
                     Debug.Log("Syncing lobby data");
-                    SyncLobby(message);
+                    SyncLobby(msg);
                     break;
             }
         }
@@ -107,8 +103,8 @@ namespace UdpNetwork
                     Message message = JsonConvert.DeserializeObject<Message>(msgJson);
                     if (message != null)
                     {
-                        Player.Messages.Enqueue(message);
                         Debug.Log("Message received: " + message.Description);
+                        ProcessMessage(message)
                     }
                 }
             }
