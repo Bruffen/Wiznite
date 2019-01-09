@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Common;
+using System.Collections;
 using System.Collections.Generic;
 using UdpNetwork;
 using UnityEngine;
@@ -29,20 +30,44 @@ namespace Menu
                     {
                         case 0:
                             PlayerCanvas[0].SetActive(true);
-                            break;
+							if (p.Player.GameState == GameState.LobbyReady)
+								SetReady(PlayerCanvas[0].transform, true);
+							else
+								SetReady(PlayerCanvas[0].transform, false);
+							break;
                         case 1:
                             PlayerCanvas[1].SetActive(true);
-                            break;
+							if (p.Player.GameState == GameState.LobbyReady)
+								SetReady(PlayerCanvas[1].transform, true);
+							else
+								SetReady(PlayerCanvas[1].transform, false);
+							break;
                         case 2:
                             PlayerCanvas[2].SetActive(true);
-                            break;
+							if (p.Player.GameState == GameState.LobbyReady)
+								SetReady(PlayerCanvas[2].transform, true);
+							else
+								SetReady(PlayerCanvas[2].transform, false);
+							break;
                         case 3:
                             PlayerCanvas[3].SetActive(true);
-                            break;
+							if (p.Player.GameState == GameState.LobbyReady)
+								SetReady(PlayerCanvas[3].transform, true);
+							else
+								SetReady(PlayerCanvas[3].transform, false);
+							break;
                     }
                 }
+
+				client.SyncPlayers = false;
             }
         }
+
+		private void SetReady(Transform t, bool isReady)
+		{
+			t.GetChild(2).GetChild(2).gameObject.SetActive(isReady);
+			t.GetChild(2).GetChild(3).gameObject.SetActive(!isReady);
+		}
 
         public void KillLobbyThread()
         {
@@ -53,5 +78,10 @@ namespace Menu
         {
             KillLobbyThread();
         }
-    }
+
+		public void GetReady()
+		{
+			client.SendPlayerReadyMessage();
+		}
+	}
 }
