@@ -18,15 +18,20 @@ namespace UdpNetwork
         private IPEndPoint endPoint, multicastEndPoint;
         private Thread thread;
         private Menu.SceneController sceneController;
+
         public bool SyncPlayers;
+        public bool IsConnected;
         private Dictionary<Guid, LobbyPlayer> lobbyPlayers;
         public List<LobbyPlayer> GetLobbyPlayers() { return lobbyPlayers.Values.ToList(); }
 
         public UdpClientController()
         {
+            IsConnected = false;
             int port = 7777;
             udpClient = new UdpClient();
             endPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), port);
+            udpClient.Client.SendTimeout = 5000;
+            udpClient.Client.ReceiveTimeout = 5000;
             udpClient.Connect(endPoint);
             SyncPlayers = false;
         }
@@ -71,10 +76,15 @@ namespace UdpNetwork
             Player.Name = name;
             Player.GameState = GameState.LobbyDisconnected;
             Player.Messages = new Queue<Message>();
-            SendPlayerMessage();
+            try
+            {
+                SendPlayerMessage();
 
-            Player answerPlayer = ReceivePlayerMessage();
-            Player.Id = answerPlayer.Id;
+                Player answerPlayer = ReceivePlayerMessage();
+                IsConnected = true;
+                Player.Id = answerPlayer.Id;
+            }
+            catch (Exception) { }
         }
 
         /*
@@ -97,11 +107,11 @@ namespace UdpNetwork
             SendPlayerMessageMulticast();
         }
 
-		public void SendPlayerLeaveMessage()
-		{
-			Player.GameState = GameState.LobbyDisconnecting;
-			SendPlayerMessageMulticast();
-		}
+        public void SendPlayerLeaveMessage()
+        {
+            Player.GameState = GameState.LobbyDisconnecting;
+            SendPlayerMessageMulticast();
+        }
 
         public void SendMessage(Message msg)
         {
@@ -288,6 +298,8 @@ namespace UdpNetwork
             thread = null;
 
             udpClient = new UdpClient();
+            udpClient.Client.SendTimeout = 5000;
+            udpClient.Client.ReceiveTimeout = 5000;
             udpClient.Connect(endPoint);
         }
     }

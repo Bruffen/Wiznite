@@ -194,7 +194,7 @@ namespace Server
             int readies = 0;
             foreach (Player player in l.Players)
             {
-                if (player.GameState == GameState.LobbyReady)
+                if (player != null && player.GameState == GameState.LobbyReady)
                     readies++;
             }
             Console.WriteLine(string.Format("{0} out of {1} players are ready in {2}.", readies, MaxPlayersPerLobby, l.Name));
