@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Lobby.unity
     guid: 5c3b21b4655f71746a02d6712455d901
+  - enabled: 1
+    path: Assets/Scenes/D'zrtMap.unity
+    guid: 54f3a32f911d97e459460eae3ccb7bcf
   m_configObjects: {}
