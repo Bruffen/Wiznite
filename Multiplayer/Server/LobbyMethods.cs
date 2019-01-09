@@ -159,11 +159,29 @@ namespace Server
             l.UdpLobby.Send(msg, msg.Length, l.EndPoint);
         }
 
-        /*
+		/*
+		* Sends all players info to multicast group
+		* Called when a new player readies up
+		*/
+		private void HandlePlayerPlayerReady(Player p, IPEndPoint endPoint)
+		{
+			LobbyServerSide l = lobbies[p.Lobby.Id];
+			l.Players[p.LobbyPos].GameState = p.GameState;
+
+			Message message = new Message();
+			message.MessageType = MessageType.LobbyStatus;
+			message.Description = JsonConvert.SerializeObject(l.Players[p.LobbyPos]);
+			string messageJson = JsonConvert.SerializeObject(message);
+			Console.WriteLine("    " + l.Players[p.LobbyPos].Name + " has readied up");
+			byte[] msg = Encoding.ASCII.GetBytes(messageJson);
+			l.UdpLobby.Send(msg, msg.Length, l.EndPoint);
+		}
+
+		/*
          * Create new multicast IP adress for new lobby
          * Checks if any are already in use or not
          */
-        private string GetNextAdress()
+		private string GetNextAdress()
         {
             string ipAddress;
             do
