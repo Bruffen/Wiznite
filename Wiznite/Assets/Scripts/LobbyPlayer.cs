@@ -11,6 +11,6 @@ public class LobbyPlayer
     public LobbyPlayer(Player player)
     {
         Player = player;
-        //gameObject = MonoBehaviour.Instantiate();
+        gameObject = MonoBehaviour.Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube));
     }
 }

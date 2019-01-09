@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -16,7 +17,10 @@ namespace UdpNetwork
         private UdpClient udpClient;
         private IPEndPoint endPoint, multicastEndPoint;
         private Thread thread;
+
+        public bool SyncPlayers;
         private Dictionary<Guid, LobbyPlayer> lobbyPlayers;
+        public List<LobbyPlayer> GetLobbyPlayers() { return lobbyPlayers.Values.ToList(); }
 
         public UdpClientController()
         {
@@ -24,6 +28,7 @@ namespace UdpNetwork
             udpClient = new UdpClient();
             endPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), port);
             udpClient.Connect(endPoint);
+            SyncPlayers = false;
         }
 
         public void UpdateMessages()
@@ -36,7 +41,7 @@ namespace UdpNetwork
             {
                 case MessageType.LobbyNewPlayer:
                     Debug.Log("Syncing lobby data");
-                    //Player[] = Json
+                    SyncLobby(message);
                     break;
             }
         }
@@ -203,6 +208,21 @@ namespace UdpNetwork
         {
             Player.GameState = GameState.LobbySync;
             SendPlayerMessageMulticast();
+        }
+
+        private void SyncLobby(Message message)
+        {
+            lobbyPlayers = new Dictionary<Guid, LobbyPlayer>();
+            Player[] players = JsonConvert.DeserializeObject<Player[]>(message.Description);
+            foreach (Player p in players)
+            {
+                if (p != null)
+                {
+                    LobbyPlayer lp = new LobbyPlayer(p);
+                    lobbyPlayers.Add(p.Id, lp);
+                }
+            }
+            SyncPlayers = true;
         }
 
         private void StartThread()

@@ -118,7 +118,11 @@ namespace Server
                 int pos = 0;
                 for (int i = 0; i < l.Players.Length; i++)
                     if (l.Players[i] == null)
+                    {
                         pos = i;
+                        break;
+                    }
+
 
                 l.Players[pos] = p;
                 p.Lobby.Name = l.Name;

@@ -390,7 +390,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 249616872}
   m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
-  m_LocalPosition: {x: 2014.9899, y: 98.52, z: 101.38}
+  m_LocalPosition: {x: 2014.9897, y: 98.52, z: 101.38}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1326633965}
@@ -1526,7 +1526,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &698129982
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1995,7 +1995,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &870094891
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2492,7 +2492,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1075885354
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3788,7 +3788,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1604303395}
   m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
-  m_LocalPosition: {x: 2004.7799, y: 98.52, z: 101.38}
+  m_LocalPosition: {x: 2004.7798, y: 98.52, z: 101.38}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1989863491}
@@ -4106,10 +4106,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f85f0329eb980484088847a883ae1da9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Player1Canvas: {fileID: 231518009}
-  Player2Canvas: {fileID: 1604303395}
-  Player3Canvas: {fileID: 1822777829}
-  Player4Canvas: {fileID: 249616872}
+  PlayerCanvas:
+  - {fileID: 2024540240}
+  - {fileID: 870094890}
+  - {fileID: 698129981}
+  - {fileID: 1075885353}
 --- !u!1 &1762662879
 GameObject:
   m_ObjectHideFlags: 0
@@ -4784,7 +4785,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2024540241
 RectTransform:
   m_ObjectHideFlags: 0
