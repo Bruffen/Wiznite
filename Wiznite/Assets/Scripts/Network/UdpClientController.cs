@@ -110,7 +110,7 @@ namespace UdpNetwork
         public void SendPlayerLeaveMessage()
         {
             Player.GameState = GameState.LobbyDisconnecting;
-            SendPlayerMessageMulticast();
+            SendPlayerMessage();
         }
 
         public void SendMessage(Message msg)

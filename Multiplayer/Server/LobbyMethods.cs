@@ -164,7 +164,6 @@ namespace Server
                 p.GameState = GameState.LobbyUnready;
 
                 playerJson = JsonConvert.SerializeObject(p);
-                Console.WriteLine("    " + playerJson);
                 Console.WriteLine(p.Name + " has joined " + l.Name);
             }
             byte[] msg = Encoding.ASCII.GetBytes(playerJson);
