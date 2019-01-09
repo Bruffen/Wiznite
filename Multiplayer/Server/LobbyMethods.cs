@@ -142,40 +142,51 @@ namespace Server
         }
 
         /*
-         * Sends all players info to multicast group
          * Called when a new player joins a lobby
          */ 
-        private void HandlePlayerJoinLobby(Player p, IPEndPoint endPoint)
+        private void HandlePlayerJoinLobby(Player p)
         {
             LobbyServerSide l = lobbies[p.Lobby.Id];
 
-            Message message = new Message();
-            message.MessageType = MessageType.LobbyNewPlayer;
-            message.Description = JsonConvert.SerializeObject(l.Players);
-            string messageJson = JsonConvert.SerializeObject(message);
-            Console.WriteLine("    Sending data to lobby " + l.Name);
-            Console.WriteLine("    " + messageJson);
-            byte[] msg = Encoding.ASCII.GetBytes(messageJson);
-            l.UdpLobby.Send(msg, msg.Length, l.EndPoint);
+            SendPlayersInLobby(l, p);
         }
 
 		/*
-		* Sends all players info to multicast group
 		* Called when a new player readies up
 		*/
-		private void HandlePlayerPlayerReady(Player p, IPEndPoint endPoint)
+		private void HandlePlayerReady(Player p)
 		{
 			LobbyServerSide l = lobbies[p.Lobby.Id];
 			l.Players[p.LobbyPos].GameState = p.GameState;
 
-			Message message = new Message();
-			message.MessageType = MessageType.LobbyStatus;
-			message.Description = JsonConvert.SerializeObject(l.Players[p.LobbyPos]);
-			string messageJson = JsonConvert.SerializeObject(message);
-			Console.WriteLine("    " + l.Players[p.LobbyPos].Name + " has readied up");
-			byte[] msg = Encoding.ASCII.GetBytes(messageJson);
-			l.UdpLobby.Send(msg, msg.Length, l.EndPoint);
+            SendPlayersInLobby(l, p);
+			Console.WriteLine("    " + l.Players[p.LobbyPos].Name + " has readied up.");
 		}
+
+        /*
+        * Called when a new player readies up
+        */
+        private void HandlePlayerUnready(Player p)
+        {
+            LobbyServerSide l = lobbies[p.Lobby.Id];
+            l.Players[p.LobbyPos].GameState = p.GameState;
+
+            SendPlayersInLobby(l, p);
+            Console.WriteLine("    " + l.Players[p.LobbyPos].Name + " is not ready.");
+        }
+
+        /*
+         * Sends all players info to multicast group
+         */
+        private void SendPlayersInLobby(LobbyServerSide l, Player p)
+        {
+            Message message = new Message();
+            message.MessageType = MessageType.LobbyStatus;
+            message.Description = JsonConvert.SerializeObject(l.Players);
+            string messageJson = JsonConvert.SerializeObject(message);
+            byte[] msg = Encoding.ASCII.GetBytes(messageJson);
+            l.UdpLobby.Send(msg, msg.Length, l.EndPoint);
+        }
 
 		/*
          * Create new multicast IP adress for new lobby

@@ -75,7 +75,13 @@ namespace Server
                             JoinExistingLobby(playerMsg, endPoint);
                             break;
                         case GameState.LobbySync:
-                            HandlePlayerJoinLobby(playerMsg, endPoint);
+                            HandlePlayerJoinLobby(playerMsg);
+                            break;
+                        case GameState.LobbyReady:
+                            HandlePlayerReady(playerMsg);
+                            break;
+                        case GameState.LobbyUnready:
+                            HandlePlayerReady(playerMsg);
                             break;
                     }
                 }

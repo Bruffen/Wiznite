@@ -52,7 +52,7 @@ namespace Menu
                 if (client.JoinExistingLobby(dynamicLobbyList.LobbySelected.ID))
                 {
                     Debug.Log("Joining " + client.Player.Lobby.Name);
-                    GetComponent<SceneController>().LoadMap();
+                    GetComponent<SceneController>().LoadLobby();
                 }
             }
         }

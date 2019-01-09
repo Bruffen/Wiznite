@@ -35,7 +35,7 @@ namespace UdpNetwork
         {
             switch (msg.MessageType)
             {
-                case MessageType.LobbyNewPlayer:
+                case MessageType.LobbyStatus:
                     Debug.Log("Syncing lobby data");
                     SyncLobby(msg);
                     break;
@@ -68,7 +68,10 @@ namespace UdpNetwork
 
         public void SendPlayerReadyMessage()
         {
-            Player.GameState = GameState.LobbyReady;
+            if (Player.GameState == GameState.LobbyReady)
+                Player.GameState = GameState.LobbyUnready;
+            else
+                Player.GameState = GameState.LobbyReady;
             SendPlayerMessageMulticast();
         }
 
@@ -220,8 +223,12 @@ namespace UdpNetwork
             {
                 if (p != null)
                 {
+                    Console.WriteLine(p.Id + ", " + Player.Id);
                     if (p.Id == Player.Id)
+                    {
                         lobbyPlayers.Add(Player.Id, new LobbyPlayer(Player));
+                        Console.WriteLine(lobbyPlayers[p.Id].Player.GameState);
+                    }
                     else
                         lobbyPlayers.Add(p.Id, new LobbyPlayer(p));
                 }
