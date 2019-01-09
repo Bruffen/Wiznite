@@ -13,6 +13,7 @@
         GameDisconnected,
         GameConnecting,
         GameConnected,
-        GameSync
+        GameSync,
+        GameEnd
     }
 }

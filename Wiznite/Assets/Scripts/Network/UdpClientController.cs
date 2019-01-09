@@ -17,7 +17,7 @@ namespace UdpNetwork
         private UdpClient udpClient;
         private IPEndPoint endPoint, multicastEndPoint;
         private Thread thread;
-
+        private Menu.SceneController sceneController;
         public bool SyncPlayers;
         private Dictionary<Guid, LobbyPlayer> lobbyPlayers;
         public List<LobbyPlayer> GetLobbyPlayers() { return lobbyPlayers.Values.ToList(); }
@@ -31,42 +31,37 @@ namespace UdpNetwork
             SyncPlayers = false;
         }
 
-        public void UpdateMessages()
+        private void ProcessMessage(Message msg)
         {
-            if (Player.Messages.Count == 0)
-                return;
-            Debug.Log("Message received");
-            Message message = Player.Messages.Dequeue();
-            switch (message.MessageType)
+            switch (msg.MessageType)
             {
-                case MessageType.LobbyNewPlayer:
+                case MessageType.LobbyStatus:
                     Debug.Log("Syncing lobby data");
-                    SyncLobby(message);
-                    break;
-                case MessageType.GameStart:
+                    SyncLobby(msg);
                     break;
                 case MessageType.RoundEnd:
+                    RoundEnd();
                     break;
                 case MessageType.GameEnd:
                     break;
             }
         }
 
-        public void GameStarted()
-        {
-            //Instantiate all players
-        }
-
         public void RestartRound()
         {
-            //Put the players back to their spawn + reset their hp.
-            //can always reinstantiate
+
         }
 
-        public void GameEnd()
+        public void RoundEnd()
         {
-            //say the player that won + go back to the lobby menu.
-            // destroy the lobby
+            foreach (var tmp in GetLobbyPlayers())
+            {
+                if (tmp.Player.numberWins > 3)
+                {
+                    Player.GameState = GameState.GameEnd;
+                    SendPlayerMessageMulticast();
+                }
+            }
         }
 
         public void CreatePlayer(string name)
@@ -146,8 +141,8 @@ namespace UdpNetwork
                     Message message = JsonConvert.DeserializeObject<Message>(msgJson);
                     if (message != null)
                     {
-                        Player.Messages.Enqueue(message);
                         Debug.Log("Message received: " + message.Description);
+                        ProcessMessage(message);
                     }
                 }
             }

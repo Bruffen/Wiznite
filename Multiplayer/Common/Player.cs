@@ -12,6 +12,7 @@ namespace Common
         public string Name { get; set; }
         public Lobby Lobby { get; set; }
         public int LobbyPos { get; set; }
+        public int numberWins { get; set; }
         public Queue<Message> Messages { get; set; }
         [JsonIgnore]
         public UdpClient UdpClient { get; set; }

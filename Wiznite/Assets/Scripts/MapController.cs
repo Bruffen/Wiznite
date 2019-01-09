@@ -12,12 +12,31 @@ public class MapController : MonoBehaviour
     float timePassed;
     bool roundEnd = true;
 
+    public GameObject parentMain, parentSlave;
+    public List<Transform> spawners;
+
+    UdpClientController udp = ClientInformation.UdpClientController;
+
+    private void Start()
+    {
+        foreach (var udp_tmp in udp.GetLobbyPlayers())
+        {
+            if (udp_tmp.Player.Id.Equals(udp.Player.Id))
+            {
+                InstantiatePlayer(udp.Player);
+            }
+            else
+            {
+                InstantiateSlave(udp.Player);
+            }
+        }
+    }
 
     void Update()
     {
         if (timePassed > TimePerRound)
         {
-            RestartScene();
+            //RestartScene();
         }
         else
             timePassed += Time.deltaTime;
@@ -25,7 +44,12 @@ public class MapController : MonoBehaviour
 
     void InstantiatePlayer(Player p)
     {
+        Instantiate(parentMain, spawners[p.LobbyPos].position, Quaternion.identity);
+    }
 
+    void InstantiateSlave(Player p)
+    {
+        Instantiate(parentSlave, spawners[p.LobbyPos].position, Quaternion.identity);
     }
 
     void RestartScene()
@@ -37,6 +61,6 @@ public class MapController : MonoBehaviour
     void OnDestroy()
     {
         if (!roundEnd)
-            ClientInformation.UdpClientController.CloseThread();
+            udp.CloseThread();
     }
 }
