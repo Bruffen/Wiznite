@@ -66,7 +66,13 @@ namespace UdpNetwork
             udpClient.Send(msg, msg.Length);
         }
 
-        private void SendPlayerMessageMulticast()
+		public void SendPlayerReadyMessage()
+		{
+			Player.GameState = GameState.LobbyReady;
+			SendPlayerMessageMulticast();
+		}
+
+		private void SendPlayerMessageMulticast()
         {
             string playerJson = JsonConvert.SerializeObject(Player);
             byte[] msg = Encoding.ASCII.GetBytes(playerJson);
