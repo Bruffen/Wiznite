@@ -16,6 +16,7 @@ namespace UdpNetwork
         private UdpClient udpClient;
         private IPEndPoint endPoint, multicastEndPoint;
         private Thread thread;
+        private Dictionary<Guid, LobbyPlayer> lobbyPlayers;
 
         public UdpClientController()
         {
@@ -25,13 +26,27 @@ namespace UdpNetwork
             udpClient.Connect(endPoint);
         }
 
+        public void UpdateMessages()
+        {
+            if (Player.Messages.Count == 0)
+                return;
+            Debug.Log("Message received");
+            Message message = Player.Messages.Dequeue();
+            switch (message.MessageType)
+            {
+                case MessageType.LobbyNewPlayer:
+                    Debug.Log("Syncing data with lobby");
+                    break;
+            }
+        }
+
         public void CreatePlayer(string name)
         {
             Player = new Player();
             Player.UdpClient = udpClient;
             Player.Name = name;
             Player.GameState = GameState.LobbyDisconnected;
-            Player.Messages = new List<Message>();
+            Player.Messages = new Queue<Message>();
             SendPlayerMessage();
 
             Player answerPlayer = ReceivePlayerMessage();
@@ -49,6 +64,13 @@ namespace UdpNetwork
             udpClient.Send(msg, msg.Length);
         }
 
+        private void SendPlayerMessageMulticast()
+        {
+            string playerJson = JsonConvert.SerializeObject(Player);
+            byte[] msg = Encoding.ASCII.GetBytes(playerJson);
+            udpClient.Send(msg, msg.Length, endPoint);
+        }
+
         private Player ReceivePlayerMessage()
         {
             byte[] answer = udpClient.Receive(ref endPoint);
@@ -58,23 +80,41 @@ namespace UdpNetwork
 
         private void Listen()
         {
-            //Join multicast for lobby communication
-            Debug.Log("Thread started");
-            udpClient.Close();
-            udpClient = new UdpClient();
-            multicastEndPoint = new IPEndPoint(IPAddress.Any, Player.Lobby.MulticastPort);
-            udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            udpClient.Client.Bind(multicastEndPoint);
-            udpClient.JoinMulticastGroup(IPAddress.Parse(Player.Lobby.MulticastIP));
-
-            while (true)
+            try
             {
-                udpClient.BeginReceive(new AsyncCallback(ReceiveCallback), udpClient);
+                //Join multicast for lobby communication
+                udpClient.Close();
+                udpClient = new UdpClient();
+                multicastEndPoint = new IPEndPoint(IPAddress.Any, Player.Lobby.MulticastPort);
+                udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                udpClient.Client.Bind(multicastEndPoint);
+                udpClient.JoinMulticastGroup(IPAddress.Parse(Player.Lobby.MulticastIP));
+                Debug.Log("Thread started listenning on " + Player.Lobby.MulticastIP);
+                //udpClient.Connect(multicastEndPoint);
+
+                while (true)
+                {
+                    //udpClient.BeginReceive(new AsyncCallback(ReceiveCallback), udpClient);
+                    byte[] msg = udpClient.Receive(ref multicastEndPoint);
+                    string msgJson = Encoding.ASCII.GetString(msg);
+
+                    Message message = JsonConvert.DeserializeObject<Message>(msgJson);
+                    if (message != null)
+                    {
+                        Player.Messages.Enqueue(message);
+                        Debug.Log("Message received: " + message.Description);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e.StackTrace);
             }
         }
 
         private void ReceiveCallback(IAsyncResult ar)
         {
+            Debug.Log("Got here");
             UdpClient u = (UdpClient)ar;
             byte[] msg = u.EndReceive(ar, ref multicastEndPoint);
 
@@ -84,7 +124,7 @@ namespace UdpNetwork
                 Message message = JsonConvert.DeserializeObject<Message>(msgJson);
                 if (message != null)
                 {
-                    Player.Messages.Add(message);
+                    Player.Messages.Enqueue(message);
                     Debug.Log("Message received: " + message.Description);
                 }
             }
@@ -108,7 +148,9 @@ namespace UdpNetwork
             SendPlayerMessage();
 
             Player answerPlayer = ReceivePlayerMessage();
+            Player.LobbyPos = answerPlayer.LobbyPos;
             Player.Lobby = answerPlayer.Lobby;
+            lobbyPlayers = new Dictionary<Guid, LobbyPlayer>();
             StartThread();
         }
 
@@ -148,10 +190,18 @@ namespace UdpNetwork
             {
                 Player.GameState = answerPlayer.GameState;
                 Player.Lobby = answerPlayer.Lobby;
+                Player.LobbyPos = answerPlayer.LobbyPos;
+                lobbyPlayers = new Dictionary<Guid, LobbyPlayer>();
                 StartThread();
                 return true;
             }
             return false;
+        }
+
+        public void FetchLobbyData()
+        {
+            Player.GameState = GameState.LobbySync;
+            SendPlayerMessageMulticast();
         }
 
         private void StartThread()
@@ -167,12 +217,13 @@ namespace UdpNetwork
         public void CloseThread()
         {
             udpClient.Close();
-            udpClient = new UdpClient();
-            udpClient.Connect(endPoint);
 
             thread.Abort();
             thread.Join(500);
             thread = null;
+
+            udpClient = new UdpClient();
+            udpClient.Connect(endPoint);
         }
     }
 }

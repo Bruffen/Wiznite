@@ -12,13 +12,13 @@ namespace Server
 {
     public partial class ServerController
     {
-        private const int MaxPlayersPerLobby = 4;
+        public const int MaxPlayersPerLobby = 4;
         private Dictionary<Guid, LobbyServerSide> lobbies;
         private Dictionary<Guid, Player> players;
         private List<IPAddress> multicastAddressesInUse;
         private int ipPart1, ipPart2, ipPart3, ipPart4;
         private UdpClient server;
-        private int multicastPort = 7777;
+        private int multicastPort = 7778;
 
         public ServerController()
         {
@@ -73,6 +73,9 @@ namespace Server
                             break;
                         case GameState.LobbyConnecting:
                             JoinExistingLobby(playerMsg, endPoint);
+                            break;
+                        case GameState.LobbySync:
+                            HandlePlayerJoinLobby(playerMsg, endPoint);
                             break;
                     }
                 }

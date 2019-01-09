@@ -20,7 +20,6 @@ namespace Server
         {
             p.Id = Guid.NewGuid();
             p.GameState = GameState.LobbyDisconnected;
-            p.IP = endPoint;
             players.Add(p.Id, p);
             Console.WriteLine("New player: " + p.Name);
 
@@ -42,10 +41,9 @@ namespace Server
             p.Lobby.MulticastIP = GetNextAdress();
             p.Lobby.MulticastPort = multicastPort;
 
-            newLobby.MulticastIP = p.Lobby.MulticastIP;
-            newLobby.MulticastPort = p.Lobby.MulticastPort;
             newLobby.UdpLobby = new UdpClient();
-            newLobby.UdpLobby.JoinMulticastGroup(IPAddress.Parse(newLobby.MulticastIP));
+            newLobby.EndPoint = new IPEndPoint(IPAddress.Parse(p.Lobby.MulticastIP), p.Lobby.MulticastPort);
+            newLobby.UdpLobby.JoinMulticastGroup(newLobby.EndPoint.Address);
 
             lobbies.Add(p.Lobby.Id, newLobby);
             Console.WriteLine(string.Format("New lobby created: {0}, {1} listenning in {2}:{3}", newLobby.Name, p.Lobby.Id, p.Lobby.MulticastIP, p.Lobby.MulticastPort));
@@ -60,8 +58,9 @@ namespace Server
          */
         private void JoinCreatedLobby(Player p, IPEndPoint endPoint)
         {
-            lobbies[p.Lobby.Id].Players.Add(p);
+            lobbies[p.Lobby.Id].Players[0] = p;
             p.GameState = GameState.LobbyUnready;
+            p.LobbyPos = 0;
             Console.WriteLine(p.Name + " has joined " + lobbies[p.Lobby.Id].Name);
 
             string playerJson = JsonConvert.SerializeObject(p);
@@ -82,7 +81,7 @@ namespace Server
                 {
                     Id = lobby.Key,
                     Name = lobby.Value.Name,
-                    PlayerCount = lobby.Value.Players.Count
+                    PlayerCount = CountPlayersInLobby(lobby.Value)
                 };
 
                 lobbyList.Add(l);
@@ -113,22 +112,52 @@ namespace Server
         {
             string playerJson = "null";
             LobbyServerSide l = lobbies[p.Lobby.Id];
-            if (l.Players.Count < MaxPlayersPerLobby)
+            bool isJoinable = CountPlayersInLobby(l) < MaxPlayersPerLobby;
+            if (isJoinable)
             {
-                l.Players.Add(p);
-                Console.WriteLine(p.Name + " has joined " + l.Name);
+                int pos = 0;
+                for (int i = 0; i < l.Players.Length; i++)
+                    if (l.Players[i] == null)
+                        pos = i;
 
+                l.Players[pos] = p;
                 p.Lobby.Name = l.Name;
-                p.Lobby.PlayerCount = l.Players.Count;
-                p.Lobby.MulticastIP = l.MulticastIP;
-                p.Lobby.MulticastPort = l.MulticastPort;
+                p.Lobby.PlayerCount = CountPlayersInLobby(l);
+                p.LobbyPos = pos;
+                p.Lobby.MulticastIP = l.EndPoint.Address.ToString();
+                p.Lobby.MulticastPort = l.EndPoint.Port;
                 p.GameState = GameState.LobbyUnready;
 
                 playerJson = JsonConvert.SerializeObject(p);
+                Console.WriteLine("    " + playerJson);
+                Console.WriteLine(p.Name + " has joined " + l.Name);
             }
             byte[] msg = Encoding.ASCII.GetBytes(playerJson);
 
             server.Send(msg, msg.Length, endPoint);
+        }
+
+        private void HandlePlayerJoinLobby(Player p, IPEndPoint endPoint)
+        {
+            LobbyServerSide l = lobbies[p.Lobby.Id];
+
+            //Tell joining player info about every other player in the lobby
+            /*Message message = new Message();
+            message.MessageType = MessageType.LobbyPlayers;
+            message.Description = JsonConvert.SerializeObject(l.Players);
+            string messageJson = JsonConvert.SerializeObject(message);
+            byte[] msg = Encoding.ASCII.GetBytes(messageJson);
+            server.Send(msg, msg.Length, endPoint);*/
+
+            //Tell other players there's a new one
+            Message message = new Message();
+            message.MessageType = MessageType.LobbyNewPlayer;
+            message.Description = JsonConvert.SerializeObject(l.Players);
+            string messageJson = JsonConvert.SerializeObject(message);
+            Console.WriteLine("    Sending data to lobby " + l.Name);
+            Console.WriteLine("    " + messageJson);
+            byte[] msg = Encoding.ASCII.GetBytes(messageJson);
+            l.UdpLobby.Send(msg, msg.Length, l.EndPoint);
         }
 
         /*
@@ -161,6 +190,17 @@ namespace Server
             //Does port need to change too?
 
             return ipAddress;
+        }
+
+        private int CountPlayersInLobby(LobbyServerSide l)
+        {
+            int count = 0;
+            for (int i = 0; i < l.Players.Length; i++)
+            {
+                if (l.Players[i] != null)
+                    count++;
+            }
+            return count;
         }
     }
 }

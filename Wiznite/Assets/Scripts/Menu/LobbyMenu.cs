@@ -13,11 +13,22 @@ namespace Menu
         void Start()
         {
             client = ClientInformation.UdpClientController;
+            client.FetchLobbyData();
+        }
+
+        void Update()
+        {
+            client.UpdateMessages();
         }
 
         public void KillLobbyThread()
         {
             client.CloseThread();
+        }
+
+        private void OnDestroy()
+        {
+            KillLobbyThread();
         }
     }
 }
