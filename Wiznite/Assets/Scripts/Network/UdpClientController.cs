@@ -66,13 +66,13 @@ namespace UdpNetwork
             udpClient.Send(msg, msg.Length);
         }
 
-		public void SendPlayerReadyMessage()
-		{
-			Player.GameState = GameState.LobbyReady;
-			SendPlayerMessageMulticast();
-		}
+        public void SendPlayerReadyMessage()
+        {
+            Player.GameState = GameState.LobbyReady;
+            SendPlayerMessageMulticast();
+        }
 
-		private void SendPlayerMessageMulticast()
+        private void SendPlayerMessageMulticast()
         {
             string playerJson = JsonConvert.SerializeObject(Player);
             byte[] msg = Encoding.ASCII.GetBytes(playerJson);
@@ -220,8 +220,10 @@ namespace UdpNetwork
             {
                 if (p != null)
                 {
-                    LobbyPlayer lp = new LobbyPlayer(p);
-                    lobbyPlayers.Add(p.Id, lp);
+                    if (p.Id == Player.Id)
+                        lobbyPlayers.Add(Player.Id, new LobbyPlayer(Player));
+                    else
+                        lobbyPlayers.Add(p.Id, new LobbyPlayer(p));
                 }
             }
             SyncPlayers = true;
