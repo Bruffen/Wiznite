@@ -137,19 +137,14 @@ namespace Server
             server.Send(msg, msg.Length, endPoint);
         }
 
+        /*
+         * Sends all players info to multicast group
+         * Called when a new player joins a lobby
+         */ 
         private void HandlePlayerJoinLobby(Player p, IPEndPoint endPoint)
         {
             LobbyServerSide l = lobbies[p.Lobby.Id];
 
-            //Tell joining player info about every other player in the lobby
-            /*Message message = new Message();
-            message.MessageType = MessageType.LobbyPlayers;
-            message.Description = JsonConvert.SerializeObject(l.Players);
-            string messageJson = JsonConvert.SerializeObject(message);
-            byte[] msg = Encoding.ASCII.GetBytes(messageJson);
-            server.Send(msg, msg.Length, endPoint);*/
-
-            //Tell other players there's a new one
             Message message = new Message();
             message.MessageType = MessageType.LobbyNewPlayer;
             message.Description = JsonConvert.SerializeObject(l.Players);
