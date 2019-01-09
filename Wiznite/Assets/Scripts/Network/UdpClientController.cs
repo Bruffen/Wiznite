@@ -36,6 +36,7 @@ namespace UdpNetwork
             {
                 case MessageType.LobbyNewPlayer:
                     Debug.Log("Syncing lobby data");
+                    //Player[] = Json
                     break;
             }
         }
