@@ -104,7 +104,7 @@ namespace UdpNetwork
                     if (message != null)
                     {
                         Debug.Log("Message received: " + message.Description);
-                        ProcessMessage(message)
+                        ProcessMessage(message);
                     }
                 }
             }

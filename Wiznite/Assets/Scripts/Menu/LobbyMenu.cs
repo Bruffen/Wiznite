@@ -18,7 +18,6 @@ namespace Menu
 
         void Update()
         {
-            client.UpdateMessages();
             if (client.SyncPlayers)
             {
                 foreach (GameObject canvas in PlayerCanvas)
