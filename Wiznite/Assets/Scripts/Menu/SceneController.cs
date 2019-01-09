@@ -18,6 +18,11 @@ namespace Menu
             SceneManager.LoadScene(2);
         }
 
+        public void LoadMap()
+        {
+            SceneManager.LoadScene(3);
+        }
+
         public void QuitGame()
         {
             Application.Quit();

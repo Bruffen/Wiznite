@@ -53,9 +53,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\DieInXSeconds.cs" />
-     <Compile Include="Assets\Scripts\Dummie.cs" />
      <Compile Include="Assets\Scripts\LobbyPlayer.cs" />
+     <Compile Include="Assets\Scripts\MapController.cs" />
      <Compile Include="Assets\Scripts\Menu\ClientInformation.cs" />
      <Compile Include="Assets\Scripts\Menu\DynamicLobbyList.cs" />
      <Compile Include="Assets\Scripts\Menu\LobbyMenu.cs" />
@@ -63,49 +62,51 @@
      <Compile Include="Assets\Scripts\Menu\PlayerCreation.cs" />
      <Compile Include="Assets\Scripts\Menu\SceneController.cs" />
      <Compile Include="Assets\Scripts\Network\UdpClientController.cs" />
-     <Compile Include="Assets\Scripts\P_Movement.cs" />
-     <Compile Include="Assets\Scripts\PlayerController.cs" />
-     <Compile Include="Assets\Scripts\PlayerHealth.cs" />
+     <Compile Include="Assets\Scripts\Player\DieInXSeconds.cs" />
+     <Compile Include="Assets\Scripts\Player\Dummie.cs" />
+     <Compile Include="Assets\Scripts\Player\P_Movement.cs" />
+     <Compile Include="Assets\Scripts\Player\PlayerController.cs" />
+     <Compile Include="Assets\Scripts\Player\PlayerHealth.cs" />
+     <Compile Include="Assets\Scripts\Player\Shooting.cs" />
+     <Compile Include="Assets\Scripts\Player\SpellController.cs" />
      <Compile Include="Assets\Scripts\ScaleWithTime.cs" />
-     <Compile Include="Assets\Scripts\Shooting.cs" />
      <Compile Include="Assets\Scripts\SimpleCameraController.cs" />
-     <Compile Include="Assets\Scripts\SpellController.cs" />
      <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
  <Reference Include="com.unity.render-pipelines.core.Editor">
- <HintPath>D:/bruno/Desktop/EDJD/3º Ano/1º Semestre/Programação de Jogos em Rede/Wiznite/Wiznite/Library/ScriptAssemblies/com.unity.render-pipelines.core.Editor.dll</HintPath>
+ <HintPath>C:/Users/Whisp/Documents/DesktopFolder/Repositiories/Wiznite/Wiznite/Library/ScriptAssemblies/com.unity.render-pipelines.core.Editor.dll</HintPath>
  </Reference>
  <Reference Include="com.unity.render-pipelines.core.Runtime">
- <HintPath>D:/bruno/Desktop/EDJD/3º Ano/1º Semestre/Programação de Jogos em Rede/Wiznite/Wiznite/Library/ScriptAssemblies/com.unity.render-pipelines.core.Runtime.dll</HintPath>
+ <HintPath>C:/Users/Whisp/Documents/DesktopFolder/Repositiories/Wiznite/Wiznite/Library/ScriptAssemblies/com.unity.render-pipelines.core.Runtime.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.StandardEvents">
- <HintPath>D:/bruno/Desktop/EDJD/3º Ano/1º Semestre/Programação de Jogos em Rede/Wiznite/Wiznite/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
+ <HintPath>C:/Users/Whisp/Documents/DesktopFolder/Repositiories/Wiznite/Wiznite/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
  </Reference>
  <Reference Include="Unity.TextMeshPro.Editor">
- <HintPath>D:/bruno/Desktop/EDJD/3º Ano/1º Semestre/Programação de Jogos em Rede/Wiznite/Wiznite/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
+ <HintPath>C:/Users/Whisp/Documents/DesktopFolder/Repositiories/Wiznite/Wiznite/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
  </Reference>
  <Reference Include="com.unity.render-pipelines.lightweight.Runtime">
- <HintPath>D:/bruno/Desktop/EDJD/3º Ano/1º Semestre/Programação de Jogos em Rede/Wiznite/Wiznite/Library/ScriptAssemblies/com.unity.render-pipelines.lightweight.Runtime.dll</HintPath>
+ <HintPath>C:/Users/Whisp/Documents/DesktopFolder/Repositiories/Wiznite/Wiznite/Library/ScriptAssemblies/com.unity.render-pipelines.lightweight.Runtime.dll</HintPath>
  </Reference>
  <Reference Include="com.unity.render-pipelines.lightweight.Editor">
- <HintPath>D:/bruno/Desktop/EDJD/3º Ano/1º Semestre/Programação de Jogos em Rede/Wiznite/Wiznite/Library/ScriptAssemblies/com.unity.render-pipelines.lightweight.Editor.dll</HintPath>
+ <HintPath>C:/Users/Whisp/Documents/DesktopFolder/Repositiories/Wiznite/Wiznite/Library/ScriptAssemblies/com.unity.render-pipelines.lightweight.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.PackageManagerUI.Editor">
- <HintPath>D:/bruno/Desktop/EDJD/3º Ano/1º Semestre/Programação de Jogos em Rede/Wiznite/Wiznite/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
+ <HintPath>C:/Users/Whisp/Documents/DesktopFolder/Repositiories/Wiznite/Wiznite/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
  </Reference>
  <Reference Include="com.unity.postprocessing.Editor">
- <HintPath>D:/bruno/Desktop/EDJD/3º Ano/1º Semestre/Programação de Jogos em Rede/Wiznite/Wiznite/Library/ScriptAssemblies/com.unity.postprocessing.Editor.dll</HintPath>
+ <HintPath>C:/Users/Whisp/Documents/DesktopFolder/Repositiories/Wiznite/Wiznite/Library/ScriptAssemblies/com.unity.postprocessing.Editor.dll</HintPath>
  </Reference>
  <Reference Include="com.unity.postprocessing.Runtime">
- <HintPath>D:/bruno/Desktop/EDJD/3º Ano/1º Semestre/Programação de Jogos em Rede/Wiznite/Wiznite/Library/ScriptAssemblies/com.unity.postprocessing.Runtime.dll</HintPath>
+ <HintPath>C:/Users/Whisp/Documents/DesktopFolder/Repositiories/Wiznite/Wiznite/Library/ScriptAssemblies/com.unity.postprocessing.Runtime.dll</HintPath>
  </Reference>
  <Reference Include="Unity.ShaderGraph.Editor">
- <HintPath>D:/bruno/Desktop/EDJD/3º Ano/1º Semestre/Programação de Jogos em Rede/Wiznite/Wiznite/Library/ScriptAssemblies/Unity.ShaderGraph.Editor.dll</HintPath>
+ <HintPath>C:/Users/Whisp/Documents/DesktopFolder/Repositiories/Wiznite/Wiznite/Library/ScriptAssemblies/Unity.ShaderGraph.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.TextMeshPro">
- <HintPath>D:/bruno/Desktop/EDJD/3º Ano/1º Semestre/Programação de Jogos em Rede/Wiznite/Wiznite/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
+ <HintPath>C:/Users/Whisp/Documents/DesktopFolder/Repositiories/Wiznite/Wiznite/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
  </Reference>
  <Reference Include="com.unity.render-pipelines.core.IncludePaths">
- <HintPath>D:/bruno/Desktop/EDJD/3º Ano/1º Semestre/Programação de Jogos em Rede/Wiznite/Wiznite/Library/ScriptAssemblies/com.unity.render-pipelines.core.IncludePaths.dll</HintPath>
+ <HintPath>C:/Users/Whisp/Documents/DesktopFolder/Repositiories/Wiznite/Wiznite/Library/ScriptAssemblies/com.unity.render-pipelines.core.IncludePaths.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.AIModule">
  <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
@@ -306,16 +307,16 @@
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnitySpatialTracking/RuntimeEditor/UnityEngine.SpatialTracking.dll</HintPath>
  </Reference>
  <Reference Include="Common">
- <HintPath>D:/bruno/Desktop/EDJD/3º Ano/1º Semestre/Programação de Jogos em Rede/Wiznite/Wiznite/Assets/Plugins/Common.dll</HintPath>
+ <HintPath>C:/Users/Whisp/Documents/DesktopFolder/Repositiories/Wiznite/Wiznite/Assets/Plugins/Common.dll</HintPath>
  </Reference>
  <Reference Include="Newtonsoft.Json">
- <HintPath>D:/bruno/Desktop/EDJD/3º Ano/1º Semestre/Programação de Jogos em Rede/Wiznite/Wiznite/Assets/Plugins/Newtonsoft.Json.dll</HintPath>
+ <HintPath>C:/Users/Whisp/Documents/DesktopFolder/Repositiories/Wiznite/Wiznite/Assets/Plugins/Newtonsoft.Json.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Analytics">
- <HintPath>C:/Users/bruno/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.analytics@2.0.16/UnityEngine.Analytics.dll</HintPath>
+ <HintPath>C:/Users/Whisp/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.analytics@2.0.16/UnityEngine.Analytics.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.StandardEvents">
- <HintPath>C:/Users/bruno/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.standardevents@1.0.13/UnityEngine.StandardEvents.dll</HintPath>
+ <HintPath>C:/Users/Whisp/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.standardevents@1.0.13/UnityEngine.StandardEvents.dll</HintPath>
  </Reference>
  <Reference Include="mscorlib">
  <HintPath>C:/Program Files/Unity/Editor/Data/MonoBleedingEdge/lib/mono/unity/mscorlib.dll</HintPath>
