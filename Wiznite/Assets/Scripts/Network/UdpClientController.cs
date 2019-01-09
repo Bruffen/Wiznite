@@ -35,7 +35,7 @@ namespace UdpNetwork
             switch (message.MessageType)
             {
                 case MessageType.LobbyNewPlayer:
-                    Debug.Log("Syncing data with lobby");
+                    Debug.Log("Syncing lobby data");
                     break;
             }
         }
