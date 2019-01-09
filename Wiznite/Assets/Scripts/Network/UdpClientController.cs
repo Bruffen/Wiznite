@@ -93,6 +93,15 @@ namespace UdpNetwork
             udpClient.Send(msg, msg.Length);
         }
 
+        public void SendPlayerReadyMessage()
+        {
+            if (Player.GameState == GameState.LobbyReady)
+                Player.GameState = GameState.LobbyUnready;
+            else
+                Player.GameState = GameState.LobbyReady;
+            SendPlayerMessageMulticast();
+        }
+
         public void SendMessage(Message msg)
         {
             string msgJson = JsonConvert.SerializeObject(msg);
