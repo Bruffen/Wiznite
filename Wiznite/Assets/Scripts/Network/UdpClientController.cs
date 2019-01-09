@@ -31,15 +31,42 @@ namespace UdpNetwork
             SyncPlayers = false;
         }
 
-        private void ProcessMessage(Message msg)
+        public void UpdateMessages()
         {
-            switch (msg.MessageType)
+            if (Player.Messages.Count == 0)
+                return;
+            Debug.Log("Message received");
+            Message message = Player.Messages.Dequeue();
+            switch (message.MessageType)
             {
-                case MessageType.LobbyStatus:
+                case MessageType.LobbyNewPlayer:
                     Debug.Log("Syncing lobby data");
-                    SyncLobby(msg);
+                    SyncLobby(message);
+                    break;
+                case MessageType.GameStart:
+                    break;
+                case MessageType.RoundEnd:
+                    break;
+                case MessageType.GameEnd:
                     break;
             }
+        }
+
+        public void GameStarted()
+        {
+            //Instantiate all players
+        }
+
+        public void RestartRound()
+        {
+            //Put the players back to their spawn + reset their hp.
+            //can always reinstantiate
+        }
+
+        public void GameEnd()
+        {
+            //say the player that won + go back to the lobby menu.
+            // destroy the lobby
         }
 
         public void CreatePlayer(string name)
@@ -66,16 +93,14 @@ namespace UdpNetwork
             udpClient.Send(msg, msg.Length);
         }
 
-        public void SendPlayerReadyMessage()
+        public void SendMessage(Message msg)
         {
-            if (Player.GameState == GameState.LobbyReady)
-                Player.GameState = GameState.LobbyUnready;
-            else
-                Player.GameState = GameState.LobbyReady;
-            SendPlayerMessageMulticast();
+            string msgJson = JsonConvert.SerializeObject(msg);
+            byte[] tmp_msg = Encoding.ASCII.GetBytes(msgJson);
+            udpClient.Send(tmp_msg, tmp_msg.Length, endPoint);
         }
 
-        private void SendPlayerMessageMulticast()
+        public void SendPlayerMessageMulticast()
         {
             string playerJson = JsonConvert.SerializeObject(Player);
             byte[] msg = Encoding.ASCII.GetBytes(playerJson);
@@ -112,8 +137,8 @@ namespace UdpNetwork
                     Message message = JsonConvert.DeserializeObject<Message>(msgJson);
                     if (message != null)
                     {
+                        Player.Messages.Enqueue(message);
                         Debug.Log("Message received: " + message.Description);
-                        ProcessMessage(message);
                     }
                 }
             }
@@ -144,7 +169,6 @@ namespace UdpNetwork
                 Debug.Log(e.StackTrace);
             }
         }
-
         /*
          * Create new lobby with name and send it the server
          * Receive server's answer with lobby's generated Id
@@ -223,14 +247,8 @@ namespace UdpNetwork
             {
                 if (p != null)
                 {
-                    Console.WriteLine(p.Id + ", " + Player.Id);
-                    if (p.Id == Player.Id)
-                    {
-                        lobbyPlayers.Add(Player.Id, new LobbyPlayer(Player));
-                        Console.WriteLine(lobbyPlayers[p.Id].Player.GameState);
-                    }
-                    else
-                        lobbyPlayers.Add(p.Id, new LobbyPlayer(p));
+                    LobbyPlayer lp = new LobbyPlayer(p);
+                    lobbyPlayers.Add(p.Id, lp);
                 }
             }
             SyncPlayers = true;

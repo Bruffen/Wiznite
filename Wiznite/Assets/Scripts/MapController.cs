@@ -11,7 +11,6 @@ public class MapController : MonoBehaviour
     public float TimePerRound;
     float timePassed;
     bool roundEnd = true;
-    UdpClientController udp = ClientInformation.UdpClientController;
 
 
     void Update()
@@ -38,6 +37,6 @@ public class MapController : MonoBehaviour
     void OnDestroy()
     {
         if (!roundEnd)
-            udp.CloseThread();
+            ClientInformation.UdpClientController.CloseThread();
     }
 }

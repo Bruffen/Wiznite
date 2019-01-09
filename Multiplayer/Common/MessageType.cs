@@ -13,6 +13,10 @@
         FinishedSync,
         Information,
         Warning,
-        Error
+        Error,
+        PlayerAttack,
+        RoundEnd,
+        GameStart,
+        GameEnd,
     }
 }

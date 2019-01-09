@@ -51,6 +51,7 @@
     <Compile Include="Message.cs" />
     <Compile Include="MessageType.cs" />
     <Compile Include="Player.cs" />
+    <Compile Include="PlayerInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

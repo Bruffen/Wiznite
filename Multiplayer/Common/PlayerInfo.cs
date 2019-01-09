@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Common
 {
-    class PlayerInfo
+    public class PlayerInfo
     {
         public Guid Id { get; set; }
         public float X { get; set; }
