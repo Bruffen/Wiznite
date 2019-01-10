@@ -24,7 +24,7 @@ public class CountDown : MonoBehaviour {
 		else
 		{
 			countdownText.fontSize = 50;
-			countdownText.text = "Witching Time!";
+			countdownText.text = "Fight!";
 		}
 
 		if (currentTime <= 0)
