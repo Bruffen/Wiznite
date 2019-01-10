@@ -86,6 +86,9 @@ namespace Server
                         case GameState.LobbyUnready:
                             HandlePlayerReady(playerMsg, endPoint);
                             break;
+                        case GameState.GameSync:
+                            SyncPlayersInLobby(lobbies[playerMsg.Lobby.Id], playerMsg);
+                            break;
 					}
                 }
             }
