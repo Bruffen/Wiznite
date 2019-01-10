@@ -15,9 +15,9 @@ public class PlayerController : MonoBehaviour
     public LayerMask layer;
     public GameObject attack;
     private Vector3 oldPosition;
+	public Transform firePos;
 
     private bool isknockback = false;
-	private bool isAttacking = false;
     private float knockBackForce = 1000;
     private float knockBackTime = 1;
     private float knockBackCounter = 0;
@@ -47,20 +47,10 @@ public class PlayerController : MonoBehaviour
             movementAnimation();
         }
 
-        //Check if is grounded or not
-        /*if (isGrounded())
-			GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezeRotation;
-		else
-		{
-			GetComponent<Rigidbody>().constraints &= ~RigidbodyConstraints.FreezePositionY;
-			FallForce();
-		}*/
-
         //Fire
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             animator.SetBool("Attacking", true);
-			isAttacking = true;
 		}
 
         //Knockback
@@ -89,7 +79,7 @@ public class PlayerController : MonoBehaviour
 
     private void Fire()
     {
-        GameObject attack1 = Instantiate(attack, this.transform.position, Quaternion.identity);
+        GameObject attack1 = Instantiate(attack, firePos.position, Quaternion.identity);
         attack1.GetComponent<SpellController>().Velocity = this.transform.forward;
 
         Message msg = new Message();
@@ -110,8 +100,6 @@ public class PlayerController : MonoBehaviour
     private void DeactivateAttack()
     {
         animator.SetBool("Attacking", false);
-		isAttacking = false;
-		Debug.Log("falserinno");
     }
 
     public void KnockBack(Vector3 direction)
@@ -181,23 +169,5 @@ public class PlayerController : MonoBehaviour
         }
         else if (forwardTest == 0 && sideTest == 0)
             animator.SetBool("Idle", true);
-    }
-
-    void FallForce()
-    {
-        float fallY;
-        float airVelocity = -9.8f;
-        Vector3 gravity = Physics.gravity * Time.deltaTime;
-        airVelocity += gravity.y;
-        fallY = airVelocity * Time.deltaTime;
-
-        transform.position = Vector3.MoveTowards(transform.position, transform.position - new Vector3(0f, fallY, 0f), Time.deltaTime * airVelocity);
-    }
-
-    private bool isGrounded()
-    {
-        //Debug.DrawLine(transform.position, transform.position + Vector3.down, Color.cyan);
-        //return Physics.Raycast(transform.position + Vector3.down, -transform.forward, hitdistance, layer);
-        return Physics.Linecast(transform.position, transform.position + Vector3.down, layer);
     }
 }
