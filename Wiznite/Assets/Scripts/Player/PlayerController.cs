@@ -15,7 +15,9 @@ public class PlayerController : MonoBehaviour
     public LayerMask layer;
     public GameObject attack;
     private Vector3 oldPosition;
-	public Transform firePos;
+    public Transform firePos;
+
+    public int HP;
 
     private bool isknockback = false;
     private float knockBackForce = 1000;
@@ -30,9 +32,12 @@ public class PlayerController : MonoBehaviour
     UdpClientController udp = ClientInformation.UdpClientController;
     private float timer;
 
+    private PlayerHealth health;
+
     // Use this for initialization
     void Start()
     {
+        health = GetComponent<PlayerHealth>();
         mainCamera = FindObjectOfType<Camera>();
         animator = GetComponent<Animator>();
         animator.SetBool("Idle", true);
@@ -52,7 +57,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             animator.SetBool("Attacking", true);
-		}
+        }
 
         //Knockback
         if (Time.time < knockBackCounter)
@@ -86,6 +91,7 @@ public class PlayerController : MonoBehaviour
 
     private void Fire()
     {
+        Debug.Log("PlayerAttacked");
         GameObject attack1 = Instantiate(attack, firePos.position, Quaternion.identity);
         attack1.GetComponent<SpellController>().Velocity = this.transform.forward;
 
@@ -170,5 +176,27 @@ public class PlayerController : MonoBehaviour
         }
         else if (forwardTest == 0 && sideTest == 0)
             animator.SetBool("Idle", true);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "Spell")
+        {
+            Vector3 direction = other.transform.position - this.transform.position;
+            direction = direction.normalized;
+            KnockBack(direction);
+
+            health.TakeDamage(10);
+            Message msg = new Message();
+            PlayerInfo info = new PlayerInfo();
+            info.Id = udp.Player.Id;
+            info.Hp = health.Health;
+            msg.MessageType = MessageType.PlayerHit;
+            msg.Description = JsonConvert.SerializeObject(info);
+            udp.Player.Messages.Enqueue(msg);
+            udp.SendPlayerMessageMulticast();
+
+            Destroy(other.gameObject);
+        }
     }
 }

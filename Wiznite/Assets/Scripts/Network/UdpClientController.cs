@@ -19,11 +19,38 @@ namespace UdpNetwork
         private Thread thread;
 
         private bool roundStart;
+        private bool slaveMoved;
+        private bool slaveAttacked;
+        private bool hit;
+        private Message currentMessage;
+
+        public Message CurrentMessage
+        {
+            get { return currentMessage; }
+        }
 
         public bool RoundStart
         {
             get { return roundStart; }
             set { roundStart = value; }
+        }
+
+        public bool SlaveMoved
+        {
+            get { return slaveMoved; }
+            set { slaveMoved = value; }
+        }
+
+        public bool SlaveAttacked
+        {
+            get { return slaveAttacked; }
+            set { slaveAttacked = value; }
+        }
+
+        public bool Hit
+        {
+            get { return hit; }
+            set { hit = value; }
         }
 
         public bool SyncPlayers;
@@ -45,11 +72,11 @@ namespace UdpNetwork
             udpClient.Connect(endPoint);
             SyncPlayers = false;
             roundStart = false;
-            handler = new UnityMonoTaskHandler();
         }
 
         private void ProcessMessage(Message msg)
         {
+            currentMessage = msg;
             switch (msg.MessageType)
             {
                 case MessageType.LobbyStatus:
@@ -65,18 +92,16 @@ namespace UdpNetwork
                     RoundEnd();
                     break;
                 case MessageType.PlayerMovement:
-                    Debug.Log("Move you Fuck");
-                    ProcessMovement(msg);
+                    slaveMoved = true;
                     break;
                 case MessageType.PlayerAttack:
-                    ProcessAttack(msg);
+                    slaveAttacked = true;
+                    break;
+                case MessageType.PlayerHit:
+                    hit = true;
                     break;
             }
-        }
-
-        public void RestartRound()
-        {
-
+            Player.Messages.Clear();
         }
 
         public void ProcessMovement(Message m)
@@ -199,7 +224,6 @@ namespace UdpNetwork
                     Message message = JsonConvert.DeserializeObject<Message>(msgJson);
                     if (message != null)
                     {
-                        Debug.Log("Message received: " + message.Description);
                         ProcessMessage(message);
                     }
                 }

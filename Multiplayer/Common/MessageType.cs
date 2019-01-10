@@ -18,5 +18,6 @@
         RoundEnd,
         GameStart,
         GameEnd,
+        PlayerHit,
     }
 }
