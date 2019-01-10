@@ -47,8 +47,8 @@ public class PlayerController : MonoBehaviour
             movementAnimation();
         }
 
-		//Check if is grounded or not
-		/*if (isGrounded())
+        //Check if is grounded or not
+        /*if (isGrounded())
 			GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezeRotation;
 		else
 		{
@@ -93,16 +93,16 @@ public class PlayerController : MonoBehaviour
         attack1.GetComponent<SpellController>().Velocity = this.transform.forward;
 
         Message msg = new Message();
-        /* PlayerInfo info = new PlayerInfo();
+        PlayerInfo info = new PlayerInfo();
         info.Id = udp.Player.Id;
         info.X = transform.position.x;
         info.Y = transform.position.y;
         info.Z = transform.position.z;
         info.RotX = transform.eulerAngles.x;
         info.RotY = transform.eulerAngles.y;
-        info.RotZ = transform.eulerAngles.z;*/
+        info.RotZ = transform.eulerAngles.z;
         msg.MessageType = MessageType.PlayerAttack;
-        //msg.Description = JsonConvert.SerializeObject(info);
+        msg.Description = JsonConvert.SerializeObject(info);
         udp.Player.Messages.Enqueue(msg);
         udp.SendPlayerMessageMulticast();
     }

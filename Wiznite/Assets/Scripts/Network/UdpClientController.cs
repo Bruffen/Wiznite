@@ -54,12 +54,16 @@ namespace UdpNetwork
                     break;
                 case MessageType.GameStart:
                     Debug.Log("SceneLoaded");
+                    ChangeState(GameState.GameSync);
                     roundStart = true;
                     break;
                 case MessageType.RoundEnd:
                     RoundEnd();
                     break;
-                case MessageType.GameEnd:
+                case MessageType.PlayerMovement:
+                    //processa o movimento do jogodor se nao for o meu.
+                    break;
+                case MessageType.PlayerAttack:
                     break;
             }
         }
@@ -67,6 +71,39 @@ namespace UdpNetwork
         public void RestartRound()
         {
 
+        }
+
+        public void ProcessMovement(Message m)
+        {
+            PlayerInfo p = JsonConvert.DeserializeObject<PlayerInfo>(m.Description);
+
+            if (p.Id != Player.Id)
+            {
+                GameObject obj = lobbyPlayers[p.Id].gameObject;
+
+                Vector3 pos = new Vector3(p.X, p.Y, p.Z);
+                Quaternion rot = Quaternion.Euler(p.RotX, p.RotY, p.RotZ);
+
+                obj.transform.position = pos;
+                obj.transform.rotation = rot;
+            }
+        }
+
+        public void ProcessAttack(Message m)
+        {
+            PlayerInfo p = JsonConvert.DeserializeObject<PlayerInfo>(m.Description);
+
+            if (p.Id != Player.Id)
+            {
+                GameObject obj = lobbyPlayers[p.Id].gameObject;
+
+                obj.GetComponent<Slave>().MakeAttack();
+            }
+        }
+
+        public void ChangeState(GameState state)
+        {
+            Player.GameState = state;
         }
 
         public void RoundEnd()
