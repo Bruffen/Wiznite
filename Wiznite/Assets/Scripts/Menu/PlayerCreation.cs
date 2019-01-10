@@ -12,9 +12,11 @@ namespace Menu
         private string playerName;
         public Text PlayerTab;
         public GameObject FailedConnection;
+        private SceneController sceneController;
 
         void Start()
         {
+            sceneController = GetComponent<SceneController>();
             ClientInformation.UdpClientController = new UdpClientController();
         }
 

@@ -184,7 +184,7 @@ namespace Server
 		/*
 		* Called when a new player readies up
 		*/
-		private void HandlePlayerReady(Player p)
+		private void HandlePlayerReady(Player p, IPEndPoint endPoint)
 		{
 			LobbyServerSide l = lobbies[p.Lobby.Id];
 			l.Players[p.LobbyPos].GameState = p.GameState;
@@ -203,6 +203,8 @@ namespace Server
                 foreach (Player player in l.Players)
                     player.GameState = GameState.GameStarted;
                 Console.WriteLine(l.Name + " is going to start.");
+
+                SendGameStartMessage(l, endPoint);
             }
             SendPlayersInLobby(l, p);
 		}
@@ -230,6 +232,15 @@ namespace Server
             string messageJson = JsonConvert.SerializeObject(message);
             byte[] msg = Encoding.ASCII.GetBytes(messageJson);
             l.UdpLobby.Send(msg, msg.Length, l.EndPoint);
+        }
+
+        private void SendGameStartMessage(LobbyServerSide l, IPEndPoint endPoint)
+        {
+            Message msg = new Message();
+            msg.MessageType = MessageType.GameStart;
+            string msgJson = JsonConvert.SerializeObject(msg);
+            byte[] msgBytes = Encoding.ASCII.GetBytes(msgJson);
+            l.UdpLobby.Send(msgBytes, msgBytes.Length, endPoint);
         }
 
 		/*

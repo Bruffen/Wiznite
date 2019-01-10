@@ -11,9 +11,11 @@ namespace Menu
     {
         public GameObject[] PlayerCanvas;
         private UdpClientController client;
+        private SceneController scnCtrl;
 
         void Start()
         {
+            scnCtrl = GetComponent<SceneController>();
             client = ClientInformation.UdpClientController;
             client.FetchLobbyData();
         }
@@ -46,6 +48,11 @@ namespace Menu
 
                 client.SyncPlayers = false;
             }
+
+            if (client.RoundStart)
+            {
+                scnCtrl.LoadMap();
+            }
         }
 
         private void UpdateCanvas(GameObject canvas, Player p)
@@ -72,7 +79,7 @@ namespace Menu
         private void OnDestroy()
         {
             KillLobbyThread();
-			RemoveClientFromLobby();
+            RemoveClientFromLobby();
         }
 
         public void GetReady()
@@ -80,9 +87,9 @@ namespace Menu
             client.SendPlayerReadyMessage();
         }
 
-		public void RemoveClientFromLobby()
-		{
-			client.SendPlayerLeaveMessage();
-		}
+        public void RemoveClientFromLobby()
+        {
+            client.SendPlayerLeaveMessage();
+        }
     }
 }

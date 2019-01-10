@@ -17,7 +17,14 @@ namespace UdpNetwork
         private UdpClient udpClient;
         private IPEndPoint endPoint, multicastEndPoint;
         private Thread thread;
-        private Menu.SceneController sceneController;
+
+        private bool roundStart;
+
+        public bool RoundStart
+        {
+            get { return roundStart; }
+            set { roundStart = value; }
+        }
 
         public bool SyncPlayers;
         public bool IsConnected;
@@ -34,6 +41,7 @@ namespace UdpNetwork
             udpClient.Client.ReceiveTimeout = 5000;
             udpClient.Connect(endPoint);
             SyncPlayers = false;
+            roundStart = false;
         }
 
         private void ProcessMessage(Message msg)
@@ -43,6 +51,10 @@ namespace UdpNetwork
                 case MessageType.LobbyStatus:
                     Debug.Log("Syncing lobby data");
                     SyncLobby(msg);
+                    break;
+                case MessageType.GameStart:
+                    Debug.Log("SceneLoaded");
+                    roundStart = true;
                     break;
                 case MessageType.RoundEnd:
                     RoundEnd();
@@ -269,6 +281,8 @@ namespace UdpNetwork
                 {
                     if (p.Id == Player.Id)
                     {
+                        if (p.GameState.Equals(GameState.GameStarted))
+                            Player.GameState = GameState.GameStarted;
                         lobbyPlayers.Add(Player.Id, new LobbyPlayer(Player));
                         Console.WriteLine(lobbyPlayers[p.Id].Player.GameState);
                     }

@@ -81,10 +81,10 @@ namespace Server
                             HandlePlayerJoinLobby(playerMsg);
                             break;
                         case GameState.LobbyReady:
-                            HandlePlayerReady(playerMsg);
+                            HandlePlayerReady(playerMsg, endPoint);
                             break;
                         case GameState.LobbyUnready:
-                            HandlePlayerReady(playerMsg);
+                            HandlePlayerReady(playerMsg, endPoint);
                             break;
 					}
                 }
