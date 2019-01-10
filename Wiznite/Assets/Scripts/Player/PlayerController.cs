@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
     private Vector3 oldPosition;
 
     private bool isknockback = false;
+	private bool isAttacking = false;
     private float knockBackForce = 1000;
     private float knockBackTime = 1;
     private float knockBackCounter = 0;
@@ -59,7 +60,8 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             animator.SetBool("Attacking", true);
-        }
+			isAttacking = true;
+		}
 
         //Knockback
         if (Time.time < knockBackCounter)
@@ -108,6 +110,8 @@ public class PlayerController : MonoBehaviour
     private void DeactivateAttack()
     {
         animator.SetBool("Attacking", false);
+		isAttacking = false;
+		Debug.Log("falserinno");
     }
 
     public void KnockBack(Vector3 direction)

@@ -7,6 +7,7 @@ public class Slave : MonoBehaviour {
 	public float speed = 7f;
 	Animator animator;
 	Vector3 oldPosition;
+	GameObject attack;
 
 	private void Start()
 	{
@@ -60,5 +61,16 @@ public class Slave : MonoBehaviour {
 		}
 		else if (forwardTest == 0 && sideTest == 0)
 			animator.SetBool("Idle", true);
+	}
+
+	public void MakeAttack()
+	{
+		animator.SetBool("Attacking", true);
+	}
+
+	private void Fire()
+	{
+		GameObject attack1 = Instantiate(attack, this.transform.position, Quaternion.identity);
+		attack1.GetComponent<SpellController>().Velocity = this.transform.forward;
 	}
 }
