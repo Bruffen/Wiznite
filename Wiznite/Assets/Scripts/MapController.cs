@@ -19,15 +19,16 @@ public class MapController : MonoBehaviour
 
     private void Start()
     {
+        udp.Player.GameState = GameState.GameSync;
         foreach (var udp_tmp in udp.GetLobbyPlayers())
         {
             if (udp_tmp.Player.Id.Equals(udp.Player.Id))
             {
-                InstantiatePlayer(udp.Player);
+                udp_tmp.gameObject = InstantiatePlayer(udp_tmp.Player);
             }
             else
             {
-                InstantiateSlave(udp.Player);
+                udp_tmp.gameObject = InstantiateSlave(udp_tmp.Player);
             }
         }
     }
@@ -42,14 +43,14 @@ public class MapController : MonoBehaviour
             timePassed += Time.deltaTime;
     }
 
-    void InstantiatePlayer(Player p)
+    GameObject InstantiatePlayer(Player p)
     {
-        Instantiate(parentMain, spawners[p.LobbyPos].position, Quaternion.identity);
+        return Instantiate(parentMain, spawners[p.LobbyPos].position, Quaternion.identity);
     }
 
-    void InstantiateSlave(Player p)
+    GameObject InstantiateSlave(Player p)
     {
-        Instantiate(parentSlave, spawners[p.LobbyPos].position, Quaternion.identity);
+        return Instantiate(parentSlave, spawners[p.LobbyPos].position, Quaternion.identity);
     }
 
     void RestartScene()
@@ -60,7 +61,7 @@ public class MapController : MonoBehaviour
 
     void OnDestroy()
     {
-        if (!roundEnd)
-            udp.CloseThread();
+        //if (!roundEnd)
+        udp.CloseThread();
     }
 }

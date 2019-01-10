@@ -52,6 +52,7 @@ namespace Menu
             if (client.RoundStart)
             {
                 scnCtrl.LoadMap();
+                client.RoundStart = false;
             }
         }
 
@@ -78,8 +79,11 @@ namespace Menu
 
         private void OnDestroy()
         {
-            KillLobbyThread();
-            RemoveClientFromLobby();
+            if (client.Player.GameState != GameState.GameStarted)
+            {
+                KillLobbyThread();
+                RemoveClientFromLobby();
+            }
         }
 
         public void GetReady()

@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
     private Vector3 oldPosition;
 
     private bool isknockback = false;
-	private bool isAttacking = false;
+    private bool isAttacking = false;
     private float knockBackForce = 1000;
     private float knockBackTime = 1;
     private float knockBackCounter = 0;
@@ -28,6 +28,7 @@ public class PlayerController : MonoBehaviour
     public float timeToFire;
 
     UdpClientController udp = ClientInformation.UdpClientController;
+    private float timer;
 
     // Use this for initialization
     void Start()
@@ -60,8 +61,8 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             animator.SetBool("Attacking", true);
-			isAttacking = true;
-		}
+            isAttacking = true;
+        }
 
         //Knockback
         if (Time.time < knockBackCounter)
@@ -72,19 +73,25 @@ public class PlayerController : MonoBehaviour
         else
             isknockback = false;
 
-        Message msg = new Message();
-        PlayerInfo info = new PlayerInfo();
-        info.Id = udp.Player.Id;
-        info.X = transform.position.x;
-        info.Y = transform.position.y;
-        info.Z = transform.position.z;
-        info.RotX = transform.eulerAngles.x;
-        info.RotY = transform.eulerAngles.y;
-        info.RotZ = transform.eulerAngles.z;
-        msg.MessageType = MessageType.PlayerMovement;
-        msg.Description = JsonConvert.SerializeObject(info);
-        udp.Player.Messages.Enqueue(msg);
-        udp.SendPlayerMessageMulticast();
+        if (timer > 0.1f && transform.position != oldPosition)
+        {
+            Message msg = new Message();
+            Debug.Log(udp.Player.GameState);
+            PlayerInfo info = new PlayerInfo();
+            info.Id = udp.Player.Id;
+            info.X = transform.position.x;
+            info.Y = transform.position.y;
+            info.Z = transform.position.z;
+            info.RotX = transform.eulerAngles.x;
+            info.RotY = transform.eulerAngles.y;
+            info.RotZ = transform.eulerAngles.z;
+            msg.MessageType = MessageType.PlayerMovement;
+            msg.Description = JsonConvert.SerializeObject(info);
+            udp.Player.Messages.Enqueue(msg);
+            udp.SendPlayerMessageMulticast();
+            timer = 0.0f;
+        }
+        timer += Time.deltaTime;
     }
 
     private void Fire()
@@ -95,12 +102,6 @@ public class PlayerController : MonoBehaviour
         Message msg = new Message();
         PlayerInfo info = new PlayerInfo();
         info.Id = udp.Player.Id;
-        info.X = transform.position.x;
-        info.Y = transform.position.y;
-        info.Z = transform.position.z;
-        info.RotX = transform.eulerAngles.x;
-        info.RotY = transform.eulerAngles.y;
-        info.RotZ = transform.eulerAngles.z;
         msg.MessageType = MessageType.PlayerAttack;
         msg.Description = JsonConvert.SerializeObject(info);
         udp.Player.Messages.Enqueue(msg);
@@ -110,8 +111,8 @@ public class PlayerController : MonoBehaviour
     private void DeactivateAttack()
     {
         animator.SetBool("Attacking", false);
-		isAttacking = false;
-		Debug.Log("falserinno");
+        isAttacking = false;
+        Debug.Log("falserinno");
     }
 
     public void KnockBack(Vector3 direction)

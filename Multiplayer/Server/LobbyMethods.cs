@@ -204,7 +204,7 @@ namespace Server
                     player.GameState = GameState.GameStarted;
                 Console.WriteLine(l.Name + " is going to start.");
 
-                SendGameStartMessage(l, endPoint);
+                SendGameStartMessage(l);
             }
             SendPlayersInLobby(l, p);
 		}
@@ -234,13 +234,13 @@ namespace Server
             l.UdpLobby.Send(msg, msg.Length, l.EndPoint);
         }
 
-        private void SendGameStartMessage(LobbyServerSide l, IPEndPoint endPoint)
+        private void SendGameStartMessage(LobbyServerSide l)
         {
             Message msg = new Message();
             msg.MessageType = MessageType.GameStart;
             string msgJson = JsonConvert.SerializeObject(msg);
             byte[] msgBytes = Encoding.ASCII.GetBytes(msgJson);
-            l.UdpLobby.Send(msgBytes, msgBytes.Length, endPoint);
+            l.UdpLobby.Send(msgBytes, msgBytes.Length, l.EndPoint);
         }
 
 		/*

@@ -18,7 +18,7 @@ public class Slave : MonoBehaviour
     public void GoToPosition(Vector3 pos)
     {
         oldPosition = transform.position;
-        transform.position += (pos * speed) * Time.deltaTime;
+        transform.position = pos;
         MakeAnimation();
     }
 

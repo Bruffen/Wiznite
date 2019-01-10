@@ -31,6 +31,9 @@ namespace UdpNetwork
         private Dictionary<Guid, LobbyPlayer> lobbyPlayers;
         public List<LobbyPlayer> GetLobbyPlayers() { return lobbyPlayers.Values.ToList(); }
 
+        private UnityMonoTaskHandler handler;
+
+
         public UdpClientController()
         {
             IsConnected = false;
@@ -42,6 +45,7 @@ namespace UdpNetwork
             udpClient.Connect(endPoint);
             SyncPlayers = false;
             roundStart = false;
+            handler = new UnityMonoTaskHandler();
         }
 
         private void ProcessMessage(Message msg)
@@ -61,9 +65,11 @@ namespace UdpNetwork
                     RoundEnd();
                     break;
                 case MessageType.PlayerMovement:
-                    //processa o movimento do jogodor se nao for o meu.
+                    Debug.Log("Move you Fuck");
+                    ProcessMovement(msg);
                     break;
                 case MessageType.PlayerAttack:
+                    ProcessAttack(msg);
                     break;
             }
         }
@@ -75,18 +81,7 @@ namespace UdpNetwork
 
         public void ProcessMovement(Message m)
         {
-            PlayerInfo p = JsonConvert.DeserializeObject<PlayerInfo>(m.Description);
-
-            if (p.Id != Player.Id)
-            {
-                GameObject obj = lobbyPlayers[p.Id].gameObject;
-
-                Vector3 pos = new Vector3(p.X, p.Y, p.Z);
-                Quaternion rot = Quaternion.Euler(p.RotX, p.RotY, p.RotZ);
-
-                obj.transform.position = pos;
-                obj.transform.rotation = rot;
-            }
+            handler.Move(m, Player.Id, lobbyPlayers);
         }
 
         public void ProcessAttack(Message m)
@@ -95,15 +90,13 @@ namespace UdpNetwork
 
             if (p.Id != Player.Id)
             {
-                GameObject obj = lobbyPlayers[p.Id].gameObject;
-
-                obj.GetComponent<Slave>().MakeAttack();
+                handler.Attack(p.Id, lobbyPlayers);
             }
         }
 
         public void ChangeState(GameState state)
         {
-            Player.GameState = state;
+            Player.GameState = GameState.GameSync;
         }
 
         public void RoundEnd()
@@ -140,7 +133,7 @@ namespace UdpNetwork
          * Creates Player Json message and sends it to server
          * It's done a lot so this method is to make things easier and cleaner
          */
-        private void SendPlayerMessage()
+        public void SendPlayerMessage()
         {
             string playerJson = JsonConvert.SerializeObject(Player);
             byte[] msg = Encoding.ASCII.GetBytes(playerJson);
@@ -354,4 +347,34 @@ namespace UdpNetwork
             udpClient.Connect(endPoint);
         }
     }
+
+    public class UnityMonoTaskHandler : MonoBehaviour
+    {
+        public void Move(Message m, Guid id, Dictionary<Guid, LobbyPlayer> lobbyPlayers)
+        {
+            PlayerInfo p = JsonConvert.DeserializeObject<PlayerInfo>(m.Description);
+
+            if (p.Id != id)
+            {
+                GameObject obj = lobbyPlayers[p.Id].gameObject;
+
+                Vector3 pos = new Vector3(p.X, p.Y, p.Z);
+
+                obj.GetComponent<Slave>().GoToPosition(pos);
+                Quaternion rot = Quaternion.Euler(p.RotX, p.RotY, p.RotZ);
+                obj.transform.rotation = rot;
+            }
+        }
+
+        public void Attack(Guid id, Dictionary<Guid, LobbyPlayer> lobbyPlayers)
+        {
+            GameObject obj = lobbyPlayers[id].gameObject;
+
+            obj.GetComponent<Slave>().MakeAttack();
+
+        }
+
+
+    }
+
 }
