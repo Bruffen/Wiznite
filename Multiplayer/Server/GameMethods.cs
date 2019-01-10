@@ -13,5 +13,14 @@ namespace Server
     public partial class ServerController
     {
 
+        private void SyncPlayersInLobby(LobbyServerSide l, Player p)
+        {
+            foreach(Message m in p.Messages)
+            {
+                string messageJson = JsonConvert.SerializeObject(m);
+                byte[] msg = Encoding.ASCII.GetBytes(messageJson);
+                l.UdpLobby.Send(msg, msg.Length, l.EndPoint);
+            }
+        }
     }
 }
