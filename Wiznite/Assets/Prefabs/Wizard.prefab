@@ -2237,7 +2237,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   attack: {fileID: 1456289417769818, guid: cc12b0c399a436d49bf680d0466e706a, type: 2}
-  firePos: {fileID: 0}
+  firePos: {fileID: 4543761079066764}
   HP: 0
   timeToFire: 0.75
 --- !u!114 &114378946461978120

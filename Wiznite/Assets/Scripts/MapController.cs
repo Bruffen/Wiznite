@@ -16,6 +16,7 @@ public class MapController : MonoBehaviour
 
     public GameObject parentMain, parentSlave;
     public List<Transform> spawners;
+    public List<Image> HealthBars;
 
     UdpClientController udp = ClientInformation.UdpClientController;
 
@@ -32,6 +33,7 @@ public class MapController : MonoBehaviour
             {
                 udp_tmp.gameObject = InstantiateSlave(udp_tmp.Player);
             }
+            udp_tmp.gameObject.GetComponent<PlayerHealth>().HealthBar = HealthBars[udp_tmp.Player.LobbyPos];
         }
     }
 
@@ -80,7 +82,8 @@ public class MapController : MonoBehaviour
             if (tmp.Player.Id.Equals(p.Id))
             {
                 GameObject obj = tmp.gameObject;
-                GameObject.Find("In_GameUI").transform.GetChild(tmp.Player.LobbyPos - 1).GetChild(2).GetComponent<Image>().fillAmount = obj.GetComponent<PlayerHealth>().HealthBar.fillAmount;
+                obj.GetComponent<PlayerHealth>().TakeDamage(10);
+                //GameObject.Find("In_GameUI").transform.GetChild(tmp.Player.LobbyPos - 1).GetChild(2).GetComponent<Image>().fillAmount = obj.GetComponent<PlayerHealth>().HealthBar.fillAmount;
             }
         }
     }
@@ -114,7 +117,6 @@ public class MapController : MonoBehaviour
             }
         }
     }
-
 
     GameObject InstantiatePlayer(Player p)
     {

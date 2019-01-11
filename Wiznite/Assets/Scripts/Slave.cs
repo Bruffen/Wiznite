@@ -8,10 +8,13 @@ public class Slave : MonoBehaviour
     public float speed = 7f;
     Animator animator;
     Vector3 oldPosition;
-    GameObject attack;
+    public GameObject attack;
+
+    public Transform FirePos;
 
     private void Start()
     {
+        oldPosition = transform.position;
         animator = GetComponent<Animator>();
     }
 
@@ -19,6 +22,10 @@ public class Slave : MonoBehaviour
     {
         oldPosition = transform.position;
         transform.position = pos;
+    }
+
+    private void Update()
+    {
         MakeAnimation();
     }
 
@@ -71,12 +78,20 @@ public class Slave : MonoBehaviour
 
     private void Fire()
     {
-        GameObject attack1 = Instantiate(attack, this.transform.position, Quaternion.identity);
+        GameObject attack1 = Instantiate(attack, FirePos.position, Quaternion.identity);
         attack1.GetComponent<SpellController>().Velocity = this.transform.forward;
     }
 
     private void DeactivateAttack()
     {
         animator.SetBool("Attacking", false);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "Spell")
+        {
+            Destroy(other.gameObject);
+        }
     }
 }

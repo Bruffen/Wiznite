@@ -2230,6 +2230,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 7
+  attack: {fileID: 1456289417769818, guid: cc12b0c399a436d49bf680d0466e706a, type: 2}
+  FirePos: {fileID: 4807398292263748}
 --- !u!114 &114296783864775240
 MonoBehaviour:
   m_ObjectHideFlags: 1

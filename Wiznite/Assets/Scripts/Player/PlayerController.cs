@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
     public LayerMask layer;
     public GameObject attack;
     private Vector3 oldPosition;
+    private Quaternion oldRotation;
     public Transform firePos;
 
     public int HP;
@@ -42,6 +43,7 @@ public class PlayerController : MonoBehaviour
         animator = GetComponent<Animator>();
         animator.SetBool("Idle", true);
         oldPosition = transform.position;
+        impactTarget = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
@@ -63,6 +65,16 @@ public class PlayerController : MonoBehaviour
             animator.SetBool("Left", false);
             animator.SetBool("Idle", false);
 
+            if (net)
+            {
+                Message msg = new Message();
+                PlayerInfo info = new PlayerInfo();
+                info.Id = udp.Player.Id;
+                msg.MessageType = MessageType.PlayerAttack;
+                msg.Description = JsonConvert.SerializeObject(info);
+                udp.Player.Messages.Enqueue(msg);
+                udp.SendPlayerMessageMulticast();
+            }
         }
 
         //Knockback
@@ -74,7 +86,7 @@ public class PlayerController : MonoBehaviour
         else
             isknockback = false;
 
-        if (timer > 0.1f && transform.position != oldPosition && net)
+        if (timer > 0.03f && DidIMove() && net)
         {
             Message msg = new Message();
             Debug.Log(udp.Player.GameState);
@@ -95,22 +107,20 @@ public class PlayerController : MonoBehaviour
         timer += Time.deltaTime;
     }
 
+    private bool DidIMove()
+    {
+        if (transform.position != oldPosition || transform.rotation != oldRotation)
+        {
+            return true;
+        }
+        return false;
+    }
+
     private void Fire()
     {
         Debug.Log("PlayerAttacked");
         GameObject attack1 = Instantiate(attack, firePos.position, Quaternion.identity);
         attack1.GetComponent<SpellController>().Velocity = this.transform.forward;
-
-        if (net)
-        {
-            Message msg = new Message();
-            PlayerInfo info = new PlayerInfo();
-            info.Id = udp.Player.Id;
-            msg.MessageType = MessageType.PlayerAttack;
-            msg.Description = JsonConvert.SerializeObject(info);
-            udp.Player.Messages.Enqueue(msg);
-            udp.SendPlayerMessageMulticast();
-        }
     }
 
     private void DeactivateAttack()
@@ -127,6 +137,7 @@ public class PlayerController : MonoBehaviour
     private void Movement()
     {
         oldPosition = transform.position;
+        oldRotation = transform.rotation;
         //movement
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
@@ -194,6 +205,8 @@ public class PlayerController : MonoBehaviour
             Vector3 direction = other.transform.position - this.transform.position;
             direction = direction.normalized;
             KnockBack(direction);
+
+            Debug.Log("I was hit");
 
             health.TakeDamage(10);
 
