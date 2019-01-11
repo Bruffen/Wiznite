@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 public class PlayerController : MonoBehaviour
 {
-
+    public bool net;
     public float speed = 7f, rotSpeed = 7f, hitdistance = 1f;
     private Vector3 moveInput;
     private Camera mainCamera;
@@ -57,6 +57,12 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             animator.SetBool("Attacking", true);
+            animator.SetBool("Foward", false);
+            animator.SetBool("Back", false);
+            animator.SetBool("Right", false);
+            animator.SetBool("Left", false);
+            animator.SetBool("Idle", false);
+
         }
 
         //Knockback
@@ -68,7 +74,7 @@ public class PlayerController : MonoBehaviour
         else
             isknockback = false;
 
-        if (timer > 0.1f && transform.position != oldPosition)
+        if (timer > 0.1f && transform.position != oldPosition && net)
         {
             Message msg = new Message();
             Debug.Log(udp.Player.GameState);
@@ -95,13 +101,16 @@ public class PlayerController : MonoBehaviour
         GameObject attack1 = Instantiate(attack, firePos.position, Quaternion.identity);
         attack1.GetComponent<SpellController>().Velocity = this.transform.forward;
 
-        Message msg = new Message();
-        PlayerInfo info = new PlayerInfo();
-        info.Id = udp.Player.Id;
-        msg.MessageType = MessageType.PlayerAttack;
-        msg.Description = JsonConvert.SerializeObject(info);
-        udp.Player.Messages.Enqueue(msg);
-        udp.SendPlayerMessageMulticast();
+        if (net)
+        {
+            Message msg = new Message();
+            PlayerInfo info = new PlayerInfo();
+            info.Id = udp.Player.Id;
+            msg.MessageType = MessageType.PlayerAttack;
+            msg.Description = JsonConvert.SerializeObject(info);
+            udp.Player.Messages.Enqueue(msg);
+            udp.SendPlayerMessageMulticast();
+        }
     }
 
     private void DeactivateAttack()
@@ -187,14 +196,18 @@ public class PlayerController : MonoBehaviour
             KnockBack(direction);
 
             health.TakeDamage(10);
-            Message msg = new Message();
-            PlayerInfo info = new PlayerInfo();
-            info.Id = udp.Player.Id;
-            info.Hp = health.Health;
-            msg.MessageType = MessageType.PlayerHit;
-            msg.Description = JsonConvert.SerializeObject(info);
-            udp.Player.Messages.Enqueue(msg);
-            udp.SendPlayerMessageMulticast();
+
+            if (net)
+            {
+                Message msg = new Message();
+                PlayerInfo info = new PlayerInfo();
+                info.Id = udp.Player.Id;
+                info.Hp = health.Health;
+                msg.MessageType = MessageType.PlayerHit;
+                msg.Description = JsonConvert.SerializeObject(info);
+                udp.Player.Messages.Enqueue(msg);
+                udp.SendPlayerMessageMulticast();
+            }
 
             Destroy(other.gameObject);
         }
