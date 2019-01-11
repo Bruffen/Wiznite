@@ -71,6 +71,18 @@ public class MapController : MonoBehaviour
                 udp.Hit = false;
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            roundEnd = true;
+            ChangePlayerState();
+            SceneManager.LoadScene("Lobby", LoadSceneMode.Single);
+        }
+    }
+
+    public void ChangePlayerState()
+    {
+        udp.Player.GameState = GameState.LobbyConnecting;
     }
 
     public void ProcessHealth(Message m)
@@ -136,7 +148,7 @@ public class MapController : MonoBehaviour
 
     void OnDestroy()
     {
-        //if (!roundEnd)
-        udp.CloseThread();
+        if (!roundEnd)
+            udp.CloseThread();
     }
 }
