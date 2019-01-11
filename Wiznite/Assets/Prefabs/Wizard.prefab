@@ -2229,6 +2229,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eff47d4ccb425e74bb7279d0367d748c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  net: 1
   speed: 7
   rotSpeed: 7
   hitdistance: 1
@@ -2236,6 +2237,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   attack: {fileID: 1456289417769818, guid: cc12b0c399a436d49bf680d0466e706a, type: 2}
+  firePos: {fileID: 0}
+  HP: 0
   timeToFire: 0.75
 --- !u!114 &114378946461978120
 MonoBehaviour:
