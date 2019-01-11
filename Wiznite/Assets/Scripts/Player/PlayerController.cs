@@ -56,14 +56,9 @@ public class PlayerController : MonoBehaviour
         }
 
         //Fire
-        if (Input.GetKeyDown(KeyCode.Mouse0))
+        if (Input.GetKeyDown(KeyCode.Mouse0) && !isknockback)
         {
             animator.SetBool("Attacking", true);
-            animator.SetBool("Foward", false);
-            animator.SetBool("Back", false);
-            animator.SetBool("Right", false);
-            animator.SetBool("Left", false);
-            animator.SetBool("Idle", false);
 
             if (net)
             {
@@ -110,7 +105,7 @@ public class PlayerController : MonoBehaviour
     private bool DidIMove()
     {
         if (transform.position != oldPosition || transform.rotation != oldRotation)
-        {
+		{
             return true;
         }
         return false;
@@ -202,7 +197,7 @@ public class PlayerController : MonoBehaviour
     {
         if (other.tag == "Spell")
         {
-            Vector3 direction = other.transform.position - this.transform.position;
+            Vector3 direction = other.transform.forward;
             direction = direction.normalized;
             KnockBack(direction);
 

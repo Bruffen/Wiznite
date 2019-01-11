@@ -27,6 +27,7 @@ public class Slave : MonoBehaviour
     private void Update()
     {
         MakeAnimation();
+		oldPosition = transform.position;
     }
 
     public void MakeAnimation()
