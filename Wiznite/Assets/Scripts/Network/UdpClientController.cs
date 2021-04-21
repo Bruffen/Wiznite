@@ -131,7 +131,7 @@ namespace UdpNetwork
                 if (tmp.Player.numberWins > 3)
                 {
                     Player.GameState = GameState.GameEnd;
-                    SendPlayerMessageMulticast();
+                    SendPlayerMessageInMulticast();
                 }
             }
         }
@@ -164,6 +164,16 @@ namespace UdpNetwork
             byte[] msg = Encoding.ASCII.GetBytes(playerJson);
             udpClient.Send(msg, msg.Length);
         }
+        /*
+         * Same as the method above but uses its IPEndPoint
+         * Useful for when connected to multicast
+         */
+        public void SendPlayerMessageInMulticast()
+        {
+            string playerJson = JsonConvert.SerializeObject(Player);
+            byte[] msg = Encoding.ASCII.GetBytes(playerJson);
+            udpClient.Send(msg, msg.Length, endPoint);
+        }
 
         public void SendPlayerReadyMessage()
         {
@@ -171,7 +181,7 @@ namespace UdpNetwork
                 Player.GameState = GameState.LobbyUnready;
             else
                 Player.GameState = GameState.LobbyReady;
-            SendPlayerMessageMulticast();
+            SendPlayerMessageInMulticast();
         }
 
         public void SendPlayerLeaveMessage()
@@ -187,12 +197,6 @@ namespace UdpNetwork
             udpClient.Send(tmp_msg, tmp_msg.Length, endPoint);
         }
 
-        public void SendPlayerMessageMulticast()
-        {
-            string playerJson = JsonConvert.SerializeObject(Player);
-            byte[] msg = Encoding.ASCII.GetBytes(playerJson);
-            udpClient.Send(msg, msg.Length, endPoint);
-        }
 
         private Player ReceivePlayerMessage()
         {
@@ -213,11 +217,9 @@ namespace UdpNetwork
                 udpClient.Client.Bind(multicastEndPoint);
                 udpClient.JoinMulticastGroup(IPAddress.Parse(Player.Lobby.MulticastIP));
                 Debug.Log("Thread started listenning on " + Player.Lobby.MulticastIP);
-                //udpClient.Connect(multicastEndPoint);
 
                 while (true)
                 {
-                    //udpClient.BeginReceive(new AsyncCallback(ReceiveCallback), udpClient);
                     byte[] msg = udpClient.Receive(ref multicastEndPoint);
                     string msgJson = Encoding.ASCII.GetString(msg);
 
@@ -322,7 +324,7 @@ namespace UdpNetwork
         public void FetchLobbyData()
         {
             Player.GameState = GameState.LobbySync;
-            SendPlayerMessageMulticast();
+            SendPlayerMessageInMulticast();
         }
 
         private void SyncLobby(Message message)

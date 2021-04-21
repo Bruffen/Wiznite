@@ -53,6 +53,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\CountDown.cs" />
      <Compile Include="Assets\Scripts\LobbyPlayer.cs" />
      <Compile Include="Assets\Scripts\MapController.cs" />
      <Compile Include="Assets\Scripts\Menu\ClientInformation.cs" />
@@ -71,6 +72,7 @@
      <Compile Include="Assets\Scripts\Player\SpellController.cs" />
      <Compile Include="Assets\Scripts\ScaleWithTime.cs" />
      <Compile Include="Assets\Scripts\SimpleCameraController.cs" />
+     <Compile Include="Assets\Scripts\Slave.cs" />
      <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
  <Reference Include="com.unity.render-pipelines.core.Editor">
  <HintPath>D:/bruno/Desktop/EDJD/3º Ano/1º Semestre/Programação de Jogos em Rede/Wiznite/Wiznite/Library/ScriptAssemblies/com.unity.render-pipelines.core.Editor.dll</HintPath>

@@ -68,7 +68,7 @@ public class PlayerController : MonoBehaviour
                 msg.MessageType = MessageType.PlayerAttack;
                 msg.Description = JsonConvert.SerializeObject(info);
                 udp.Player.Messages.Enqueue(msg);
-                udp.SendPlayerMessageMulticast();
+                udp.SendPlayerMessageInMulticast();
             }
         }
 
@@ -96,7 +96,7 @@ public class PlayerController : MonoBehaviour
             msg.MessageType = MessageType.PlayerMovement;
             msg.Description = JsonConvert.SerializeObject(info);
             udp.Player.Messages.Enqueue(msg);
-            udp.SendPlayerMessageMulticast();
+            udp.SendPlayerMessageInMulticast();
             timer = 0.0f;
         }
         timer += Time.deltaTime;
@@ -105,7 +105,7 @@ public class PlayerController : MonoBehaviour
     private bool DidIMove()
     {
         if (transform.position != oldPosition || transform.rotation != oldRotation)
-		{
+        {
             return true;
         }
         return false;
@@ -214,7 +214,7 @@ public class PlayerController : MonoBehaviour
                 msg.MessageType = MessageType.PlayerHit;
                 msg.Description = JsonConvert.SerializeObject(info);
                 udp.Player.Messages.Enqueue(msg);
-                udp.SendPlayerMessageMulticast();
+                udp.SendPlayerMessageInMulticast();
             }
 
             Destroy(other.gameObject);
